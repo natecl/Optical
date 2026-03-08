@@ -6,6 +6,8 @@
 - [x] Create skeletal boilerplate for key components with docstrings.
 - [x] Consolidate workspace into a single lowercase project folder (`/Users/n.chinlue/optical`) and flatten migrated Next.js files into repo root.
 - [x] Remove temporary `legacy-root-backup` directory after consolidation validation.
+- [x] Restore README project description and structure after workspace consolidation.
+- [x] Replace README.md content with the canonical project description provided by user.
 
 ## Phase 2: Core Frontend Infrastructure
 - [x] Initialize Next.js project with Tailwind CSS (`npx create-next-app@latest`).

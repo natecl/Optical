@@ -1,87 +1,131 @@
-This is the Optical Next.js app plus a separate WebSocket service.
+Optical 👁️
 
-## Getting Started
+Real-Time AI That Explains the Physical World
 
-Create env files from `.envexample` before running services:
+Optical is a real-time multimodal AI agent that uses a device camera and
+microphone to analyze the surrounding environment and explain objects,
+systems, and diagrams interactively.
 
-```bash
-cp .envexample .env.local
-```
+Users can point their camera at an object and ask questions like: - What
+is this? - How does this work? - What parts am I looking at? - Teach me
+how to use this.
 
-Run the Next.js development server:
+The goal is to make learning from the physical world as easy as asking a
+question.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+============================== OVERVIEW ==============================
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Optical processes three inputs: - Camera frames - User voice input -
+Conversation context
 
-Run the standalone WebSocket service:
+The system produces: - Object identification - Visual scene
+understanding - Context-aware explanations - Interactive tutoring
+responses
 
-```bash
-npm run ws:dev
-```
+============================== SYSTEM ARCHITECTURE
+==============================
 
-Or build/start it in two steps:
+User Device (Camera + Microphone) | Frontend (Next.js) | Backend
+(Node.js WebSocket) | AI Model (Multimodal) | AI Response (Text + Voice)
 
-```bash
-npm run ws:build
-npm run ws:start
-```
+============================== CORE FEATURES
+==============================
 
-Defaults:
-- WS endpoint: `ws://localhost:8080/ws`
-- Health endpoint: `http://localhost:8080/health`
-- Env overrides: `WS_SERVICE_HOST`, `WS_SERVICE_PORT`
+1.  Object Recognition Detect visible objects in the camera feed and
+    estimate object category and components.
 
-Run the standalone Express backend service:
+Example: Object: Bicycle drivetrain Components: chain, crankset,
+cassette
 
-```bash
-npm run backend:dev
-```
+2.  Scene Understanding Interpret the entire visual scene including
+    object relationships and orientation.
 
-Or build/start it in two steps:
+Example: Object: Espresso Machine Parts: - steam wand - portafilter -
+drip tray
 
-```bash
-npm run backend:build
-npm run backend:start
-```
+3.  Voice Interaction Users speak naturally: “What is this?” “How does
+    it work?”
 
-Defaults:
-- Backend endpoint: `http://localhost:4000`
-- Health endpoint: `http://localhost:4000/health`
-- Interaction endpoint: `POST http://localhost:4000/api/interact`
-- Env overrides: `BACKEND_HOST`, `BACKEND_PORT`
+4.  Real-Time Explanation Engine Generate explanations using visual
+    context and conversation history.
 
-Interaction message format over WebSocket:
+Example: Pedaling rotates the crank which pulls the chain and turns the
+rear wheel.
 
-```json
-{
-  "type": "interact",
-  "payload": {
-    "frameData": null,
-    "transcribedText": "Explain what this is",
-    "convoState": { "mode": "standard" }
-  }
-}
-```
+5.  Interactive Learning Mode Optical can quiz users or simplify
+    explanations.
 
-The frontend also includes a basic chatbot panel (`components/basicchatbot.tsx`) that sends `chat` messages over WebSocket and displays Gemini responses.
+Example: “What part transfers motion from pedals to the wheel?”
 
-Response message format:
+6.  Context Memory The agent remembers what object the user is
+    discussing across multiple questions.
 
-```json
-{
-  "type": "interaction_result",
-  "payload": {
-    "status": "success",
-    "msg": "This is a placeholder Gemini response."
-  }
-}
-```
+============================== AI AGENT DESIGN
+==============================
+
+Modules:
+
+Visual Perception Module Receives camera frames and detects objects.
+
+Scene Interpreter Determines primary object and domain.
+
+Conversation Manager Tracks conversation state: - current object -
+previous questions - interaction mode
+
+Explanation Generator Creates responses based on context.
+
+============================== AI WORKFLOW
+==============================
+
+1 Capture camera frame 2 Capture microphone audio 3 Send input to
+backend 4 Backend forwards to AI model 5 Model analyzes image 6 Model
+interprets question 7 Model generates explanation 8 Response returned to
+frontend 9 UI displays explanation 10 Audio playback
+
+============================== USER INTERACTION FLOW
+==============================
+
+1 User opens Optical 2 Camera activates 3 User points camera at object 4
+User asks question 5 Frame and audio sent to backend 6 AI processes
+scene 7 AI returns explanation 8 UI displays response
+
+============================== TECHNICAL COMPONENTS
+==============================
+
+Frontend - Next.js - React - Tailwind - WebRTC - Web Audio API
+
+Backend - Node.js - Express - WebSockets
+
+AI Layer - Multimodal reasoning - Scene interpretation - Explanation
+generation
+
+============================== PROJECT STRUCTURE
+==============================
+
+optical/ app/ components/ CameraView MicrophoneInput TranscriptPanel
+OverlayLabels ModeToggle
+
+server/ websocketServer ai/ geminiSession agentController
+
+lib/ audio/ vision/ state/
+
+============================== FEATURE IMPLEMENTATION PLAN
+==============================
+
+Phase 1 - camera capture - voice input - AI explanations
+
+Phase 2 - real-time streaming - voice responses - object overlays
+
+Phase 3 - quizzes - tutoring - multi-object understanding
+
+============================== FUTURE FEATURES
+==============================
+
+-   AR overlays for labeling object parts
+-   mechanical simulations
+-   collaborative learning
+-   persistent memory
+
+============================== LICENSE ==============================
+
+MIT License
