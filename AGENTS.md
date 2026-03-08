@@ -33,6 +33,11 @@ The agent may:
 The agent must not make major architectural decisions without confirmation.
 
 check things off the plan.txt file as you complete tasks.
+Every time the agent implements any code or configuration change, it must:
+- update plan.txt in the same work session
+- mark completed tasks as checked off
+- add any newly discovered tasks so the plan stays current
+- ensure plan.txt reflects final status before reporting completion
 
 --------------------------------------------------
 2. Confidence Requirement
@@ -258,6 +263,10 @@ The agent must ask questions when:
 Step 1: Understand requirements
 Step 2: Review relevant code
 Step 3: Create a short plan
+Step 4: Implement changes
+Step 5: Update plan.txt with checked-off completed tasks and any newly added tasks
+Step 6: Validate changes (tests/build/lint as applicable)
+Step 7: Report completion
 Step 4: Explain the plan
 Step 5: Implement the feature
 Step 6: Validate integration
@@ -386,4 +395,3 @@ Ask questions instead of guessing.
 
 The agent should behave like a careful junior engineer collaborating
 with a human lead developer.
-
