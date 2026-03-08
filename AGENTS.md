@@ -1,10 +1,10 @@
 
 # AGENT.md
-# Optical AI Engineering Agent Specification
+# CookMate AI Engineering Agent Specification
 
 This document defines the rules, responsibilities, architecture constraints,
 behavior policies, and development workflow for AI coding agents working on
-the Optical codebase.
+the CookMate codebase.
 
 The purpose of this file is to ensure AI agents behave as reliable junior
 software engineers collaborating with a human lead developer.
@@ -72,7 +72,7 @@ structure.
 4. Project Overview
 --------------------------------------------------
 
-Optical is a real-time multimodal AI assistant that analyzes camera input
+CookMate is a real-time multimodal AI assistant that analyzes camera input
 and user voice input to explain objects in the physical world.
 
 Users can point their camera at an object and ask:
