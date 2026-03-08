@@ -32,6 +32,8 @@ The agent may:
 
 The agent must not make major architectural decisions without confirmation.
 
+check things off the plan.txt file as you complete tasks.
+
 --------------------------------------------------
 2. Confidence Requirement
 --------------------------------------------------
