@@ -2,12 +2,16 @@
   "name": "optical",
   "version": "1.0.0",
   "description": "Optical 👁️",
-  "main": "index.js",
+  "main": "dist/server/index.js",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node scripts/dev.mjs",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "npm run typecheck"
   },
   "repository": {
     "type": "git",
@@ -16,7 +20,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/natecl/Optical/issues"
   },

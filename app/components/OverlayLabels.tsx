@@ -9,8 +9,6 @@
  *   - objects (Array): List of detected objects with bounding box coordinates and labels.
  */
 
-import React from 'react';
-
 interface OverlayObject {
     x: number; // Percentage
     y: number; // Percentage

@@ -2,6 +2,24 @@ Optical 👁️
 
 Real-Time AI That Explains the Physical World
 
+============================== GETTING STARTED ==============================
+
+Install dependencies if needed:
+
+`npm install`
+
+Run the local development server:
+
+`npm run dev`
+
+Build for production:
+
+`npm run build`
+
+Start the compiled server:
+
+`npm start`
+
 Optical is a real-time multimodal AI agent that uses a device camera and
 microphone to analyze the surrounding environment and explain objects,
 systems, and diagrams interactively.

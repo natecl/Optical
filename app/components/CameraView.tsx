@@ -11,14 +11,14 @@
  *   - isActive (boolean): Controls whether the camera feed is currently running.
  */
 
-import React, { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface CameraViewProps {
     isActive: boolean;
 }
 
 export default function CameraView({ isActive }: CameraViewProps) {
-    const videoRef = useRef(null);
+    const videoRef = useRef<HTMLVideoElement | null>(null);
 
     useEffect(() => {
         // Boilerplate for WebRTC webcam capture setup
