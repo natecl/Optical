@@ -7,7 +7,12 @@
  *   `geminiSession` to get insights, and passes the result back to the user.
  */
 
-import { GeminiSession } from './geminiSession.js';
+import { GeminiSession } from './geminiSession';
+
+interface ChatTurn {
+    role: "user" | "assistant";
+    text: string;
+}
 
 export class AgentController {
     private session: GeminiSession;
@@ -19,7 +24,7 @@ export class AgentController {
     /**
      * Handles an incoming user request from the UI
      */
-    async processInteraction(frameData: any, transcribedText: string, convoState: any) {
+    async processInteraction(frameData: unknown, transcribedText: string, convoState: Record<string, unknown> | null) {
         try {
             // 1. Scene Interpretation
             // 2. Query execution via Gemini
@@ -30,6 +35,16 @@ export class AgentController {
         } catch (e) {
             console.error("Error in AgentController:", e);
             return { msg: "Sorry, an error occurred.", status: 'error' };
+        }
+    }
+
+    async processChatPrompt(prompt: string, history: ChatTurn[]) {
+        try {
+            const response = await this.session.generateChatReply(prompt, history);
+            return { msg: response, status: "success" };
+        } catch (e) {
+            console.error("Error in AgentController chat flow:", e);
+            return { msg: "Sorry, an error occurred.", status: "error" };
         }
     }
 }

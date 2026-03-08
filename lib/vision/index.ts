@@ -6,6 +6,8 @@
  *   boxes, converting canvas frame to Base64/Blob, or lightweight CV operations.
  */
 
-export function extractFrameData(videoElement: any) {
+export function extractFrameData(videoElement: HTMLVideoElement): string | null {
+    void videoElement;
     // Boilerplate to canvas draw and get data
+    return null;
 }

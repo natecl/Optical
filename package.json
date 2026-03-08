@@ -1,40 +1,36 @@
 {
   "name": "optical",
-  "version": "1.0.0",
-  "description": "Optical 👁️",
-  "main": "dist/server/index.js",
-  "directories": {
-    "lib": "lib"
-  },
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "node scripts/dev.mjs",
-    "build": "tsc -p tsconfig.json",
-    "start": "node dist/server/index.js",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "npm run typecheck"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "backend:build": "tsc -p backend-service/tsconfig.json",
+    "backend:start": "node backend-service/dist/backend-service/src/index.js",
+    "backend:dev": "node backend-service/dev.mjs",
+    "ws:build": "tsc -p ws-service/tsconfig.json",
+    "ws:start": "node ws-service/dist/ws-service/src/index.js",
+    "ws:dev": "node ws-service/dev.mjs"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/natecl/Optical.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "bugs": {
-    "url": "https://github.com/natecl/Optical/issues"
-  },
-  "homepage": "https://github.com/natecl/Optical#readme",
   "dependencies": {
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "express": "^5.2.1",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
     "ws": "^8.19.0"
   },
   "devDependencies": {
-    "@types/node": "^25.3.5",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
+    "@tailwindcss/postcss": "^4",
+    "@types/express": "^5.0.6",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "@types/ws": "^8.18.1",
-    "typescript": "^5.9.3"
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
