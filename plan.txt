@@ -1,4 +1,4 @@
-# Optical Project Development Plan and Workflow
+# CookMate Project Development Plan and Workflow
 
 ## Phase 1: Foundation & Project Structure (Current)
 - [x] Define project scope in README.
@@ -29,13 +29,59 @@
 
 ## Phase 5: Advanced Features
 - [ ] Build visual processing module in `lib/vision` for extracting objects from video frames.
+- [ ] Add frame sampling pipeline (target 1-2 FPS for inference) with backpressure protection to avoid request pileups.
+- [ ] Define typed detection schema (id, label, confidence, bounding box, timestamp) shared across frontend/backend.
+- [ ] Add frame pre-processing utilities (resize, compress, normalize) to reduce payload size before inference.
+- [ ] Add object tracking between frames (stable IDs + smoothing) to reduce overlay jitter.
+- [ ] Implement confidence thresholding and de-duplication for overlapping detections.
 - [ ] Implement `OverlayLabels` for on-screen object identification.
+- [ ] Render boxes/labels with viewport-safe positioning and collision handling for label readability.
+- [ ] Add responsive overlay scaling for mobile/desktop and orientation changes.
+- [ ] Add accessibility fallbacks (text list of detected objects when overlays are hidden/unsupported).
 - [ ] Add `ModeToggle` (e.g., Learning Mode vs Standard Mode).
+- [ ] Define explicit mode behavior matrix:
+- [ ] `standard`: concise direct answers
+- [ ] `learning`: step-by-step explanations + follow-up prompts
+- [ ] `quiz`: questions first, reveal explanation after user attempt
+- [ ] Persist mode in client state and include mode in all `interact`/`chat` payloads.
+- [ ] Add telemetry hooks for advanced features (detection latency, overlay render time, mode usage).
+- [ ] Acceptance criteria for Phase 5:
+- [ ] Overlay updates smoothly under active camera stream without blocking UI interactions.
+- [ ] Mode switch changes backend response style within one round-trip.
+- [ ] Detection metadata is visible in transcript/debug logs for verification.
 
 ## Phase 6: Polish and Deployment
 - [ ] Finalize UI/UX animations and styling.
+- [ ] Establish design tokens (color, spacing, typography, elevation) and remove inconsistent ad-hoc styles.
+- [ ] Add loading/empty/error states for camera, microphone, WS connection, and chatbot interactions.
+- [ ] Improve interaction polish:
+- [ ] panel entrance transitions
+- [ ] transcript message reveal animation
+- [ ] mode-toggle transition feedback
+- [ ] Add mobile-first layout pass (small-screen panel ordering, touch targets, keyboard-safe input spacing).
 - [ ] Optimize real-time latency for WebRTC/WebSockets.
+- [ ] Instrument end-to-end latency budget:
+- [ ] capture -> send
+- [ ] backend processing
+- [ ] model response
+- [ ] render/display
+- [ ] Add retry/backoff strategy for websocket reconnect and failed inference calls.
+- [ ] Reduce payload overhead (binary/frame compression, trimmed chat history window).
+- [ ] Add server-side safeguards (request timeouts, per-connection rate limits, message size limits).
 - [ ] Deploy frontend to Vercel and backend to a WebSocket-friendly host (e.g., Render/Railway).
+- [ ] Add environment matrix documentation for dev/staging/prod (`NEXT_PUBLIC_WS_URL`, `GEMINI_API_KEY`, ports, hostnames).
+- [ ] Create deployment checklists:
+- [ ] pre-deploy (lint/build/typecheck)
+- [ ] deploy (frontend + ws-service + backend-service)
+- [ ] post-deploy smoke tests (`/health`, websocket connect, chatbot message round-trip)
+- [ ] Add observability baseline:
+- [ ] centralized logs for ws-service/backend-service
+- [ ] error alerting for repeated WS disconnects and Gemini failures
+- [ ] basic uptime checks for public health endpoints
+- [ ] Acceptance criteria for Phase 6:
+- [ ] Lighthouse performance/accessibility targets met for primary page.
+- [ ] Chatbot + interact flows pass smoke tests in deployed environment.
+- [ ] Rollback steps documented and tested once.
 
 ## Operational Fixes
 - [x] Fix local chatbot WebSocket connection by making `npm run dev` start both frontend and ws-service.

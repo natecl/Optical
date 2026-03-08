@@ -1,8 +1,8 @@
-Optical 👁️
+CookMate 👁️
 
 Real-Time AI That Explains the Physical World
 
-Optical is a real-time multimodal AI agent that uses a device camera and
+CookMate is a real-time multimodal AI agent that uses a device camera and
 microphone to analyze the surrounding environment and explain objects,
 systems, and diagrams interactively.
 
@@ -15,7 +15,7 @@ question.
 
 ============================== OVERVIEW ==============================
 
-Optical processes three inputs: - Camera frames - User voice input -
+CookMate processes three inputs: - Camera frames - User voice input -
 Conversation context
 
 The system produces: - Object identification - Visual scene
@@ -52,7 +52,7 @@ drip tray
 Example: Pedaling rotates the crank which pulls the chain and turns the
 rear wheel.
 
-5.  Interactive Learning Mode Optical can quiz users or simplify
+5.  Interactive Learning Mode CookMate can quiz users or simplify
     explanations.
 
 Example: “What part transfers motion from pedals to the wheel?”
@@ -85,7 +85,7 @@ frontend 9 UI displays explanation 10 Audio playback
 ============================== USER INTERACTION FLOW
 ==============================
 
-1 User opens Optical 2 Camera activates 3 User points camera at object 4
+1 User opens CookMate 2 Camera activates 3 User points camera at object 4
 User asks question 5 Frame and audio sent to backend 6 AI processes
 scene 7 AI returns explanation 8 UI displays response
 
@@ -102,12 +102,12 @@ generation
 ============================== PROJECT STRUCTURE
 ==============================
 
-optical/ app/ components/ CameraView MicrophoneInput TranscriptPanel
-OverlayLabels ModeToggle
+cookmate/
+client/ app/ components/ lib/ public/
 
-server/ websocketServer ai/ geminiSession agentController
+server/ core/ websocketServer ai/ geminiSession agentController
 
-lib/ audio/ vision/ state/
+server/ ws-service/ backend-service/
 
 ============================== FEATURE IMPLEMENTATION PLAN
 ==============================

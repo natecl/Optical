@@ -1,20 +1,20 @@
 {
-  "name": "optical",
+  "name": "cookmate",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "dev:web": "next dev",
+    "dev:web": "npm --prefix client run dev",
     "dev:all": "node scripts/dev.mjs",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint",
-    "backend:build": "tsc -p backend-service/tsconfig.json",
-    "backend:start": "node backend-service/dist/backend-service/src/index.js",
-    "backend:dev": "node backend-service/dev.mjs",
-    "ws:build": "tsc -p ws-service/tsconfig.json",
-    "ws:start": "node ws-service/dist/ws-service/src/index.js",
-    "ws:dev": "node ws-service/dev.mjs"
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix client run start",
+    "lint": "npm --prefix client run lint",
+    "backend:build": "tsc -p server/backend-service/tsconfig.json",
+    "backend:start": "node server/backend-service/dist/backend-service/src/index.js",
+    "backend:dev": "node server/backend-service/dev.mjs",
+    "ws:build": "tsc -p server/ws-service/tsconfig.json",
+    "ws:start": "node server/ws-service/dist/ws-service/src/index.js",
+    "ws:dev": "node server/ws-service/dev.mjs"
   },
   "dependencies": {
     "express": "^5.2.1",
