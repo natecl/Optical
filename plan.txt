@@ -1,0 +1,33 @@
+# Optical Project Development Plan and Workflow
+
+## Phase 1: Foundation & Project Structure (Current)
+- [x] Define project scope in README.
+- [x] Establish base file structure (Next.js app directory, Server directory, Shared Libs).
+- [x] Create skeletal boilerplate for key components with docstrings.
+
+## Phase 2: Core Frontend Infrastructure
+- [ ] Initialize Next.js project with Tailwind CSS (`npx create-next-app@latest`).
+- [ ] Set up basic UI shell (Tailwind layout) encompassing Camera, Audio, and Transcript panels.
+- [ ] Implement `CameraView`: Integrate WebRTC hooks for accessing user webcam.
+- [ ] Implement `MicrophoneInput`: Set up Web Audio API to capture voice.
+- [ ] Implement `TranscriptPanel`: Display conversational history.
+
+## Phase 3: Core Backend Infrastructure
+- [ ] Set up Node.js / Express backend server.
+- [ ] Implement real-time communications using `websocketServer`.
+- [ ] Wire frontend Next.js to backend WebSocket.
+
+## Phase 4: AI & Multimodal Integration
+- [ ] Integrate `geminiSession` to connect Node.js server to multimodal AI models.
+- [ ] Build `agentController` to organize visual state, audio context, and coordinate responses.
+- [ ] Stream AI responses back to frontend `TranscriptPanel`.
+
+## Phase 5: Advanced Features
+- [ ] Build visual processing module in `lib/vision` for extracting objects from video frames.
+- [ ] Implement `OverlayLabels` for on-screen object identification.
+- [ ] Add `ModeToggle` (e.g., Learning Mode vs Standard Mode).
+
+## Phase 6: Polish and Deployment
+- [ ] Finalize UI/UX animations and styling.
+- [ ] Optimize real-time latency for WebRTC/WebSockets.
+- [ ] Deploy frontend to Vercel and backend to a WebSocket-friendly host (e.g., Render/Railway).
