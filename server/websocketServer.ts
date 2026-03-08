@@ -8,8 +8,9 @@
  */
 
 import { WebSocketServer } from 'ws';
+import type { Server } from 'http';
 
-export const startWebSocketServer = (server) => {
+export const startWebSocketServer = (server: Server) => {
     const wss = new WebSocketServer({ server });
 
     wss.on('connection', (ws) => {

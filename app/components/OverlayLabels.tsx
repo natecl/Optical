@@ -11,7 +11,19 @@
 
 import React from 'react';
 
-export default function OverlayLabels({ objects = [] }) {
+interface OverlayObject {
+    x: number; // Percentage
+    y: number; // Percentage
+    width: number; // Percentage
+    height: number; // Percentage
+    label: string;
+}
+
+interface OverlayLabelsProps {
+    objects?: OverlayObject[];
+}
+
+export default function OverlayLabels({ objects = [] }: OverlayLabelsProps) {
     return (
         <div className="absolute inset-0 pointer-events-none">
             {objects.map((obj, idx) => (

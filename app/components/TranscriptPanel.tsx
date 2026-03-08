@@ -11,7 +11,16 @@
 
 import React from 'react';
 
-export default function TranscriptPanel({ history = [] }) {
+interface Message {
+    sender: 'user' | 'agent';
+    text: string;
+}
+
+interface TranscriptPanelProps {
+    history?: Message[];
+}
+
+export default function TranscriptPanel({ history = [] }: TranscriptPanelProps) {
     return (
         <div className="w-full h-64 overflow-y-auto bg-black/60 backdrop-blur-md rounded-xl p-4 border border-white/10 flex flex-col gap-3">
             {history.length === 0 ? (

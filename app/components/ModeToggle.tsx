@@ -12,7 +12,12 @@
 
 import React from 'react';
 
-export default function ModeToggle({ currentMode, onModeChange }) {
+interface ModeToggleProps {
+    currentMode: string;
+    onModeChange: (mode: string) => void;
+}
+
+export default function ModeToggle({ currentMode, onModeChange }: ModeToggleProps) {
     return (
         <div className="flex bg-white/5 rounded-full p-1 border border-white/10">
             <button

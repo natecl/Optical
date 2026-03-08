@@ -11,9 +11,11 @@
  *   - isActive (boolean): Controls whether the camera feed is currently running.
  */
 
-import React, { useRef, useEffect } from 'react';
+interface CameraViewProps {
+    isActive: boolean;
+}
 
-export default function CameraView({ isActive }) {
+export default function CameraView({ isActive }: CameraViewProps) {
     const videoRef = useRef(null);
 
     useEffect(() => {
