@@ -106,7 +106,11 @@ export default function BasicChatbot() {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
       setMessages((prev) => [
         ...prev,
-        { id: crypto.randomUUID(), role: "assistant", text: "WebSocket is not connected." },
+        {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          text: "WebSocket is not connected. Start it with `npm run dev` (or run `npm run dev:web` + `npm run ws:dev`).",
+        },
       ]);
       return;
     }

@@ -36,3 +36,9 @@
 - [ ] Finalize UI/UX animations and styling.
 - [ ] Optimize real-time latency for WebRTC/WebSockets.
 - [ ] Deploy frontend to Vercel and backend to a WebSocket-friendly host (e.g., Render/Railway).
+
+## Operational Fixes
+- [x] Fix local chatbot WebSocket connection by making `npm run dev` start both frontend and ws-service.
+- [x] Split dev workflows so `npm run dev` always serves frontend and `npm run dev:all` runs frontend + ws-service for chatbot testing.
+- [x] Re-align default dev command so `npm run dev` launches frontend + ws-service for zero-config chatbot connectivity.
+- [x] Make `npm run dev` resilient: keep frontend running even if ws-service startup fails.

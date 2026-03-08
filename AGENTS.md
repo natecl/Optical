@@ -36,7 +36,7 @@ check things off the plan.txt file as you complete tasks.
 Every time the agent implements any code or configuration change, it must:
 - update plan.txt in the same work session
 - mark completed tasks as checked off
-- add any newly discovered tasks so the plan stays current
+- not add new tasks unless the user explicitly asks to modify plan scope
 - ensure plan.txt reflects final status before reporting completion
 
 --------------------------------------------------
@@ -264,7 +264,7 @@ Step 1: Understand requirements
 Step 2: Review relevant code
 Step 3: Create a short plan
 Step 4: Implement changes
-Step 5: Update plan.txt with checked-off completed tasks and any newly added tasks
+Step 5: Update plan.txt by checking off completed existing tasks only
 Step 6: Validate changes (tests/build/lint as applicable)
 Step 7: Report completion
 Step 4: Explain the plan

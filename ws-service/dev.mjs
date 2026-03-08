@@ -45,4 +45,8 @@ start(
   ["tsc", "--watch", "--preserveWatchOutput", "-p", "ws-service/tsconfig.json"],
   "ws-service tsc watcher",
 );
-start("node", ["--watch", "ws-service/dist/ws-service/src/index.js"], "ws-service node watcher");
+start(
+  "node",
+  ["--watch", "--watch-preserve-output", "ws-service/dist/ws-service/src/index.js"],
+  "ws-service node watcher",
+);
