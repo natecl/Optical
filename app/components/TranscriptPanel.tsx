@@ -9,8 +9,6 @@
  *   - history (Array): List of message objects { sender: 'user' | 'agent', text: string }.
  */
 
-import React from 'react';
-
 interface Message {
     sender: 'user' | 'agent';
     text: string;

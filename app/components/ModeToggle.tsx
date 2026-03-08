@@ -10,8 +10,6 @@
  *   - onModeChange (callback): Fired when the user selects a new mode.
  */
 
-import React from 'react';
-
 interface ModeToggleProps {
     currentMode: string;
     onModeChange: (mode: string) => void;

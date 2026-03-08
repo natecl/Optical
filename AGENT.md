@@ -234,6 +234,9 @@ When the human developer provides corrections the agent must:
 1. accept correction
 2. adjust reasoning
 3. avoid repeating mistakes
+4. Add context from the newly completed features to the AGENT.md file so the agent can learn.
+5. create skills for the agent to learn from, making it more efficient.
+6. update the readme.md file with new context
 
 --------------------------------------------------
 13. Question Asking Policy
@@ -381,3 +384,4 @@ Ask questions instead of guessing.
 
 The agent should behave like a careful junior engineer collaborating
 with a human lead developer.
+
