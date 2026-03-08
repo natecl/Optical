@@ -6,6 +6,7 @@
  *   such as converting bitrates, detecting silence, or text-to-speech tasks.
  */
 
-export function processAudioChunk(chunk: any) {
+export function processAudioChunk(chunk: unknown) {
+    void chunk;
     // Boilerplate for manipulating audio
 }

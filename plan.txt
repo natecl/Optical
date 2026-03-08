@@ -4,23 +4,26 @@
 - [x] Define project scope in README.
 - [x] Establish base file structure (Next.js app directory, Server directory, Shared Libs).
 - [x] Create skeletal boilerplate for key components with docstrings.
+- [x] Consolidate workspace into a single lowercase project folder (`/Users/n.chinlue/optical`) and flatten migrated Next.js files into repo root.
+- [x] Remove temporary `legacy-root-backup` directory after consolidation validation.
 
 ## Phase 2: Core Frontend Infrastructure
-- [ ] Initialize Next.js project with Tailwind CSS (`npx create-next-app@latest`).
-- [ ] Set up basic UI shell (Tailwind layout) encompassing Camera, Audio, and Transcript panels.
-- [ ] Implement `CameraView`: Integrate WebRTC hooks for accessing user webcam.
-- [ ] Implement `MicrophoneInput`: Set up Web Audio API to capture voice.
-- [ ] Implement `TranscriptPanel`: Display conversational history.
+- [x] Initialize Next.js project with Tailwind CSS (`npx create-next-app@latest`).
+- [x] Set up basic UI shell (Tailwind layout) encompassing Camera, Audio, and Transcript panels.
+- [x] Implement `CameraView`: Integrate WebRTC hooks for accessing user webcam.
+- [x] Implement `MicrophoneInput`: Set up Web Audio API to capture voice.
+- [x] Implement `TranscriptPanel`: Display conversational history.
 
 ## Phase 3: Core Backend Infrastructure
-- [ ] Set up Node.js / Express backend server.
-- [ ] Implement real-time communications using `websocketServer`.
-- [ ] Wire frontend Next.js to backend WebSocket.
+- [x] Set up Node.js / Express backend server.
+- [x] Implement real-time communications using `websocketServer`.
+- [x] Wire frontend Next.js to backend WebSocket.
 
 ## Phase 4: AI & Multimodal Integration
-- [ ] Integrate `geminiSession` to connect Node.js server to multimodal AI models.
-- [ ] Build `agentController` to organize visual state, audio context, and coordinate responses.
-- [ ] Stream AI responses back to frontend `TranscriptPanel`.
+- [x] Integrate `geminiSession` to connect Node.js server to multimodal AI models.
+- [x] Build `agentController` to organize visual state, audio context, and coordinate responses.
+- [x] Stream AI responses back to frontend `TranscriptPanel`.
+- [x] Add a basic WebSocket chatbot UI in frontend for end-to-end backend usability testing.
 
 ## Phase 5: Advanced Features
 - [ ] Build visual processing module in `lib/vision` for extracting objects from video frames.

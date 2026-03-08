@@ -1,8 +1,21 @@
 import { createServer } from 'node:http';
-import { renderAppDocument } from '../app/index.js';
 import { startWebSocketServer } from './websocketServer.js';
 
 const port = Number.parseInt(process.env.PORT ?? '3000', 10);
+
+const renderAppDocument = (host: string): string => `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Optical Server</title>
+  </head>
+  <body style="font-family: system-ui, sans-serif; padding: 24px;">
+    <h1>Optical backend server</h1>
+    <p>WebSocket endpoint: ws://${host}</p>
+    <p>Health check: /health</p>
+  </body>
+</html>`;
 
 const server = createServer((req, res) => {
     const host = req.headers.host ?? `localhost:${port}`;
@@ -21,7 +34,7 @@ const server = createServer((req, res) => {
     }
 
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
-    res.end(renderAppDocument({ host, port }));
+    res.end(renderAppDocument(host));
 });
 
 startWebSocketServer(server);
