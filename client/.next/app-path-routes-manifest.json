@@ -1,8 +1,0 @@
-{
-  "/favicon.ico/route": "/favicon.ico",
-  "/_global-error/page": "/_global-error",
-  "/_not-found/page": "/_not-found",
-  "/page": "/",
-  "/api/health/route": "/api/health",
-  "/api/interact/route": "/api/interact"
-}

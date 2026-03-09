@@ -1,131 +1,292 @@
-CookMate 👁️
 
-Real-Time AI That Explains the Physical World
+# 🍳 CookMate — AI Cooking Sous Chef
 
-CookMate is a real-time multimodal AI agent that uses a device camera and
-microphone to analyze the surrounding environment and explain objects,
-systems, and diagrams interactively.
+**CookMate is an AI-powered cooking sous chef web application built with React, TypeScript, Node.js, Express, Supabase, and Google ADK that helps users generate recipes, cook with live visual guidance, and automatically log meals and macros.**
 
-Users can point their camera at an object and ask questions like: - What
-is this? - How does this work? - What parts am I looking at? - Teach me
-how to use this.
+CookMate combines computer vision, conversational AI agents, and generative media to guide users through cooking meals step-by-step. The system acts like a real-time AI cooking assistant that can help users discover recipes, cook using ingredients they already have, and receive interactive guidance while preparing food.
 
-The goal is to make learning from the physical world as easy as asking a
-question.
+---
 
-============================== OVERVIEW ==============================
+# 🚀 Features
 
-CookMate processes three inputs: - Camera frames - User voice input -
-Conversation context
+## 🔐 Authentication
+- Secure sign-in using Google OAuth
+- Personalized user profiles
+- Persistent user data including recipes and meal logs
 
-The system produces: - Object identification - Visual scene
-understanding - Context-aware explanations - Interactive tutoring
-responses
+---
 
-============================== SYSTEM ARCHITECTURE
-==============================
+## 🧑‍🍳 Recipe Creation
 
-User Device (Camera + Microphone) | Frontend (Next.js) | Backend
-(Node.js WebSocket) | AI Model (Multimodal) | AI Response (Text + Voice)
+Users can start cooking in two different ways:
 
-============================== CORE FEATURES
-==============================
+### 1️⃣ Use a Pre-Existing Recipe
 
-1.  Object Recognition Detect visible objects in the camera feed and
-    estimate object category and components.
+Users can:
+- Paste a recipe link into an input box
+- Ask the AI agent to generate a recipe for a specific dish
 
-Example: Object: Bicycle drivetrain Components: chain, crankset,
-cassette
+The AI agent can also:
+- Adapt recipes
+- Suggest ingredient substitutions
+- Adjust recipes based on user preferences
 
-2.  Scene Understanding Interpret the entire visual scene including
-    object relationships and orientation.
+---
 
-Example: Object: Espresso Machine Parts: - steam wand - portafilter -
-drip tray
+### 2️⃣ Cook From Scratch (AI Ingredient Detection)
 
-3.  Voice Interaction Users speak naturally: “What is this?” “How does
-    it work?”
+Users can enable their camera to start a live cooking session.
 
-4.  Real-Time Explanation Engine Generate explanations using visual
-    context and conversation history.
+The CookMate AI agent will:
+- Identify ingredients in real time
+- Suggest recipes based on detected ingredients
+- Converse with the user to refine the recipe
+- Help design a custom recipe based on available ingredients
 
-Example: Pedaling rotates the crank which pulls the chain and turns the
-rear wheel.
+Example interaction:
 
-5.  Interactive Learning Mode CookMate can quiz users or simplify
-    explanations.
+User:
+"What can I cook with these ingredients?"
 
-Example: “What part transfers motion from pedals to the wheel?”
+Agent:
+"You have chicken, garlic, onions, and tomatoes. You could make garlic chicken stir fry or a simple tomato chicken skillet. Which would you like?"
 
-6.  Context Memory The agent remembers what object the user is
-    discussing across multiple questions.
+---
 
-============================== AI AGENT DESIGN
-==============================
+# 🎥 Real-Time Cooking Guidance
 
-Modules:
+Once a recipe has been selected, CookMate becomes a live AI sous chef.
 
-Visual Perception Module Receives camera frames and detects objects.
+Using the camera feed, the agent can:
+- Provide step-by-step cooking instructions
+- Verify that steps are completed correctly
+- Monitor cooking progress
 
-Scene Interpreter Determines primary object and domain.
+Examples of verification:
+- Correct browning of meat
+- Proper vegetable cutting size
+- Cooking stage identification
+- Ingredient preparation
 
-Conversation Manager Tracks conversation state: - current object -
-previous questions - interaction mode
+The user can interact with the agent at any time:
+- “Is this browned enough?”
+- “Did I cut this correctly?”
 
-Explanation Generator Creates responses based on context.
+---
 
-============================== AI WORKFLOW
-==============================
+# 🎨 AI Visual Cooking Instructions
 
-1 Capture camera frame 2 Capture microphone audio 3 Send input to
-backend 4 Backend forwards to AI model 5 Model analyzes image 6 Model
-interprets question 7 Model generates explanation 8 Response returned to
-frontend 9 UI displays explanation 10 Audio playback
+CookMate enhances instructions using AI-generated visuals.
 
-============================== USER INTERACTION FLOW
-==============================
+For each step the system can generate:
+- Instructional images
+- Animated cooking demonstrations
+- Visual references for cooking techniques
 
-1 User opens CookMate 2 Camera activates 3 User points camera at object 4
-User asks question 5 Frame and audio sent to backend 6 AI processes
-scene 7 AI returns explanation 8 UI displays response
+Examples:
+- Knife cutting styles
+- Proper browning levels
+- Sauce thickness
+- Vegetable sizes
 
-============================== TECHNICAL COMPONENTS
-==============================
+This allows users to learn visually while cooking.
 
-Frontend - Next.js - React - Tailwind - WebRTC - Web Audio API
+---
 
-Backend - Node.js - Express - WebSockets
+# 🥗 Nutrition Tracking
 
-AI Layer - Multimodal reasoning - Scene interpretation - Explanation
-generation
+After the recipe is completed:
 
-============================== PROJECT STRUCTURE
-==============================
+The meal is automatically stored in the user's daily meal log.
 
-cookmate/
-client/ app/ components/ lib/ public/
+CookMate calculates and tracks:
+- Calories
+- Protein
+- Carbohydrates
+- Fats
 
-server/ core/ websocketServer ai/ geminiSession agentController
+Users can review their daily and historical nutrition data inside the application.
 
-server/ ws-service/ backend-service/
+---
 
-============================== FEATURE IMPLEMENTATION PLAN
-==============================
+# 🧠 AI Capabilities
 
-Phase 1 - camera capture - voice input - AI explanations
+CookMate integrates several AI systems.
 
-Phase 2 - real-time streaming - voice responses - object overlays
+### Conversational Cooking Agent
+Built using Google Agent Development Kit (ADK).
 
-Phase 3 - quizzes - tutoring - multi-object understanding
+The cooking agent can:
+- Generate recipes
+- Guide cooking sessions
+- Answer cooking questions
+- Adapt instructions dynamically
 
-============================== FUTURE FEATURES
-==============================
+### Computer Vision
+Vision models enable:
+- Ingredient detection
+- Cooking stage recognition
+- Food texture identification
 
--   AR overlays for labeling object parts
--   mechanical simulations
--   collaborative learning
--   persistent memory
+The system uses live camera input to monitor cooking progress.
 
-============================== LICENSE ==============================
+### Generative Media
+CookMate generates:
+- Cooking instruction images
+- Animated demonstrations
+- Visual technique explanations
 
-MIT License
+These visuals help users better understand cooking instructions.
+
+---
+
+# 🏗 Tech Stack
+
+## Frontend
+- React
+- TypeScript
+- TailwindCSS
+- WebRTC (live camera feed)
+
+## Backend
+- Node.js
+- Express
+- TypeScript
+- WebSockets for real-time communication
+
+## Database & Backend Platform
+- Supabase
+  - PostgreSQL database
+  - Authentication
+  - Storage
+  - Realtime subscriptions
+
+Supabase stores:
+- User profiles
+- Recipes
+- Cooking sessions
+- Ingredient data
+- Meal logs
+- Nutrition macros
+
+## AI / Agent Infrastructure
+- Google Agent Development Kit (ADK)
+- Computer vision models for ingredient detection
+- Conversational LLM cooking agent
+- AI image generation for instructional visuals
+
+---
+
+# ⚙️ System Architecture
+
+Client (React + TypeScript)
+        │
+        │ WebSocket / REST
+        ▼
+Backend API (Node.js + Express)
+        │
+        ├── Agent Service (Google ADK)
+        │      ├── Recipe generation
+        │      ├── Conversational cooking agent
+        │      └── Instruction generation
+        │
+        ├── Vision Service
+        │      ├── Ingredient detection
+        │      └── Cooking step verification
+        │
+        ├── Media Generation Service
+        │      ├── Instruction images
+        │      └── Cooking animations
+        │
+        ▼
+Supabase (Postgres)
+(User data, recipes, sessions, meal logs)
+
+---
+
+# 📹 Example User Flow
+
+1️⃣ User signs in using Google OAuth
+
+2️⃣ User chooses one of the following options:
+- Generate recipe
+- Import recipe from link
+- Cook using available ingredients
+
+3️⃣ If cooking from ingredients:
+- Camera activates
+- AI detects ingredients
+
+4️⃣ AI suggests possible recipes
+
+5️⃣ User selects recipe
+
+6️⃣ CookMate guides the cooking process:
+- Live instructions
+- Visual demonstrations
+- Camera verification of steps
+
+7️⃣ Meal is completed and logged with nutrition macros
+
+---
+
+# 📦 Installation
+
+Clone the repository:
+
+git clone https://github.com/yourusername/cookmate
+cd cookmate
+
+Install dependencies:
+
+npm install
+
+Run the development server:
+
+npm run dev
+
+---
+
+# 📁 Project Structure
+
+cookmate
+│
+├── client
+│   ├── components
+│   ├── pages
+│   ├── hooks
+│   └── styles
+│
+├── server
+│   ├── controllers
+│   ├── routes
+│   ├── services
+│   │     ├── agent
+│   │     ├── vision
+│   │     └── media
+│   └── utils
+│
+├── database
+│   └── migrations
+│
+└── README.md
+
+---
+
+# 🔮 Future Improvements
+
+- Voice-controlled cooking
+- Grocery list generation
+- Pantry inventory tracking
+- Meal planning tools
+- Mobile application
+- Smart kitchen device integration
+- Community recipe sharing
+
+---
+
+# 🎯 Vision
+
+CookMate aims to become a true AI cooking companion that helps users cook confidently, learn new techniques, and make the most of the ingredients they already have.
+
+The goal is to transform cooking into a guided, interactive, and intelligent experience powered by AI.
