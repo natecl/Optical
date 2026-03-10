@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CookMate Recipe Search</title>
+    <link rel="stylesheet" href="./styles/main.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>CookMate Recipe Search</h1>
+      <label for="dishInput" class="input-label">What would you like to cook?</label>
+      <div class="controls">
+        <input id="dishInput" class="dish-input" type="text" placeholder="e.g. chicken" />
+        <button id="searchButton" class="search-button" type="button">Search</button>
+      </div>
+      <textarea id="statusBox" class="status-box" readonly></textarea>
+    </main>
+
+    <script type="module" src="./pages/index.js"></script>
+  </body>
+</html>
