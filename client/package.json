@@ -4,6 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node dev-server.js"
+    "dev": "vite"
+  },
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.4",
+    "vite": "^7.3.1"
   }
 }

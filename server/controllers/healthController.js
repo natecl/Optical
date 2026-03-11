@@ -1,20 +1,17 @@
-const postRecipe = (req, res) => {
-  const { dish } = req.body || {};
-  const normalizedDish = typeof dish === 'string' ? dish.trim().toLowerCase() : '';
+const { processRecipeRequest, RecipeRequestError } = require('../services/recipeService');
 
-  if (!normalizedDish) {
-    res.status(400).json({
-      status: 'failed',
-      message: 'dish is required'
-    });
-    return;
+const postRecipe = async (req, res) => {
+  try {
+    const recipe = await processRecipeRequest(req.body);
+    res.status(200).json(recipe);
+  } catch (error) {
+    if (error instanceof RecipeRequestError) {
+      res.status(error.status).json({ error: error.message });
+      return;
+    }
+
+    res.status(500).json({ error: 'Recipe generation failed' });
   }
-
-  res.status(200).json({
-    'recipe name': `${normalizedDish} and rice`,
-    ingredients: [normalizedDish, 'rice'],
-    instructions: `cook the ${normalizedDish} and rice`
-  });
 };
 
 module.exports = {

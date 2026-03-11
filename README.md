@@ -8,7 +8,7 @@ CookMate combines computer vision, conversational AI agents, and generative medi
 
 ## Current Local Scaffold (Implemented in This Repo)
 
-This repository currently includes a **minimal local development setup** for frontend/backend connectivity and mocked recipe responses.
+This repository currently includes a **minimal local development setup** for frontend/backend connectivity and an ADK-powered recipe agent.
 
 ### What Works Today
 - Frontend served at `http://localhost:3000`
@@ -17,13 +17,13 @@ This repository currently includes a **minimal local development setup** for fro
   - Method: `POST`
   - Path: `/api/recipe`
   - URL: `http://localhost:5000/api/recipe`
-- Mocked backend response only (no DB, no external APIs)
+- Backend recipe generation via ADK (`nanabot`) and Gemini
 
 ### Example Request Body
 
 ```json
 {
-  "dish": "chicken"
+  "ingredient": "chicken"
 }
 ```
 
@@ -39,7 +39,7 @@ This repository currently includes a **minimal local development setup** for fro
 
 ### Frontend Behavior
 - Input labeled: `What would you like to cook?`
-- User enters dish and clicks `Search`
+- User enters a dish/ingredient and clicks `Search`
 - Shows `loading` during request
 - Shows recipe name, ingredients, and instructions on success
 - Shows error message on failure
@@ -47,6 +47,7 @@ This repository currently includes a **minimal local development setup** for fro
 ### Local Run
 
 ```bash
+export GEMINI_API_KEY=your_key_here
 npm install --prefix server
 npm install
 npm run dev
