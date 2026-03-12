@@ -1,4 +1,5 @@
 const { generateRecipeFromPrompt } = require('./agent/nanabotService');
+const { normalizeIngredientList } = require('../utils/ingredientNormalization');
 
 const ALLOWED_MODES = new Set(['suggestion', 'import', 'ingredients']);
 
@@ -13,10 +14,12 @@ class RecipeRequestError extends Error {
 const isObject = (value) => typeof value === 'object' && value !== null && !Array.isArray(value);
 
 const parseIngredientCsv = (csv) =>
-  csv
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean);
+  normalizeIngredientList(
+    csv
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+  );
 
 const stripHtml = (html) =>
   html
@@ -127,11 +130,16 @@ const preprocessSuggestion = (data) => {
 };
 
 const preprocessIngredients = (data) => {
-  if (typeof data.ingredients !== 'string' || !data.ingredients.trim()) {
+  let ingredients = [];
+
+  if (typeof data.ingredients === 'string' && data.ingredients.trim()) {
+    ingredients = parseIngredientCsv(data.ingredients);
+  } else if (Array.isArray(data.ingredients)) {
+    ingredients = normalizeIngredientList(data.ingredients);
+  } else {
     throw new RecipeRequestError('Invalid request body', 400);
   }
 
-  const ingredients = parseIngredientCsv(data.ingredients);
   if (ingredients.length === 0) {
     throw new RecipeRequestError('Invalid request body', 400);
   }

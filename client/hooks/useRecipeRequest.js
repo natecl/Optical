@@ -1,6 +1,6 @@
 const RECIPE_URL = 'http://localhost:5000/api/recipe';
 
-const buildRequestBody = ({ mode, inputValue }) => {
+const buildRequestBody = ({ mode, inputValue, inputMethod, ingredientsList }) => {
   if (mode === 'suggestion') {
     return {
       mode,
@@ -17,17 +17,18 @@ const buildRequestBody = ({ mode, inputValue }) => {
 
   return {
     mode,
-    data: { ingredients: inputValue }
+    ...(inputMethod ? { inputMethod } : {}),
+    data: { ingredients: Array.isArray(ingredientsList) ? ingredientsList : inputValue }
   };
 };
 
-export const requestRecipe = async ({ mode, inputValue }) => {
+export const requestRecipe = async ({ mode, inputValue, inputMethod, ingredientsList }) => {
   const response = await fetch(RECIPE_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(buildRequestBody({ mode, inputValue }))
+    body: JSON.stringify(buildRequestBody({ mode, inputValue, inputMethod, ingredientsList }))
   });
 
   let payload = null;
