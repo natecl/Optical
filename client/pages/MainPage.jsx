@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { startTransition, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage.jsx';
+import IngredientScanPanel from '../components/IngredientScanPanel.jsx';
 import LoadingIndicator from '../components/LoadingIndicator.jsx';
 import ModeSelector from '../components/ModeSelector.jsx';
+import { useLiveIngredientScan } from '../hooks/useLiveIngredientScan.js';
 import { requestRecipe } from '../hooks/useRecipeRequest.js';
 
 const PLACEHOLDERS = {
@@ -17,17 +19,33 @@ const MainPage = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const {
+    isScanning,
+    detectedIngredients,
+    confirmedIngredients,
+    scanError,
+    setConfirmedIngredients,
+    startScan,
+    stopScan,
+    finalizeIngredients,
+    resetScanState,
+    videoRef,
+    canvasRef
+  } = useLiveIngredientScan();
 
   const trimmedInput = inputValue.trim();
   const placeholderText = selectedMode ? PLACEHOLDERS[selectedMode] : 'Choose a mode first';
-  const isSubmitDisabled = !selectedMode || !trimmedInput || isLoading;
+  const hasConfirmedCameraIngredients =
+    selectedMode === 'ingredients' && confirmedIngredients.some((ingredient) => ingredient.trim());
+  const hasInputForSubmit = hasConfirmedCameraIngredients || Boolean(trimmedInput);
+  const isSubmitDisabled = !selectedMode || !hasInputForSubmit || isLoading || isScanning;
 
-  const inlineValidationMessage = useMemo(() => {
+  const inlineValidationMessage = (() => {
     if (!selectedMode) {
       return 'Please select a mode to continue.';
     }
 
-    if (!trimmedInput) {
+    if (!hasInputForSubmit) {
       return 'Please provide input before submitting.';
     }
 
@@ -43,12 +61,28 @@ const MainPage = () => {
     }
 
     return '';
-  }, [selectedMode, trimmedInput]);
+  })();
+
+  useEffect(() => {
+    if (selectedMode === 'ingredients') {
+      setInputValue(confirmedIngredients.filter(Boolean).join(', '));
+    }
+  }, [confirmedIngredients, selectedMode]);
 
   const handleModeSelect = (mode) => {
     setSelectedMode(mode);
     setInputValue('');
     setErrorMessage('');
+    resetScanState();
+  };
+
+  const handleStartScan = async () => {
+    try {
+      setErrorMessage('');
+      await startScan();
+    } catch (_error) {
+      setErrorMessage('Camera access failed. Please allow camera permission and try again.');
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -62,12 +96,29 @@ const MainPage = () => {
     setIsLoading(true);
 
     try {
-      const recipe = await requestRecipe({ mode: selectedMode, inputValue: trimmedInput });
+      const cleanedConfirmedIngredients = confirmedIngredients
+        .map((ingredient) => ingredient.trim())
+        .filter(Boolean);
+      const usingCameraIngredients =
+        selectedMode === 'ingredients' && cleanedConfirmedIngredients.length > 0;
 
-      navigate('/your-recipe', {
-        state: {
-          recipe
-        }
+      if (usingCameraIngredients) {
+        finalizeIngredients(cleanedConfirmedIngredients);
+      }
+
+      const recipe = await requestRecipe({
+        mode: selectedMode,
+        inputValue: trimmedInput,
+        inputMethod: usingCameraIngredients ? 'camera_live' : undefined,
+        ingredientsList: usingCameraIngredients ? cleanedConfirmedIngredients : undefined
+      });
+
+      startTransition(() => {
+        navigate('/your-recipe', {
+          state: {
+            recipe
+          }
+        });
       });
     } catch (error) {
       setErrorMessage(error.message || 'Network error. Please try again.');
@@ -84,17 +135,49 @@ const MainPage = () => {
         <ModeSelector
           selectedMode={selectedMode}
           onSelect={handleModeSelect}
-          disabled={isLoading}
+          disabled={isLoading || isScanning}
         />
 
-        <input
-          type="text"
-          className="shared-input"
-          value={inputValue}
-          placeholder={placeholderText}
-          onChange={(event) => setInputValue(event.target.value)}
-          disabled={isLoading}
-        />
+        <div className="input-with-action">
+          <input
+            type="text"
+            className="shared-input"
+            value={inputValue}
+            placeholder={placeholderText}
+            onChange={(event) => setInputValue(event.target.value)}
+            disabled={isLoading || isScanning}
+          />
+
+          {selectedMode === 'ingredients' && (
+            <button
+              type="button"
+              className="camera-button"
+              onClick={handleStartScan}
+              disabled={isLoading || isScanning}
+              aria-label="Start live camera scan"
+            >
+              <svg viewBox="0 0 24 24" className="camera-icon" aria-hidden="true">
+                <path
+                  d="M8 6h2.2l1.1-1.7h1.4L13.8 6H16c1.7 0 3 1.3 3 3v6c0 1.7-1.3 3-3 3H8c-1.7 0-3-1.3-3-3V9c0-1.7 1.3-3 3-3Zm4 3.2A3.8 3.8 0 1 0 12 17a3.8 3.8 0 0 0 0-7.8Zm0 1.8a2 2 0 1 1 0 4.1 2 2 0 0 1 0-4.1Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        {selectedMode === 'ingredients' && (
+          <IngredientScanPanel
+            isScanning={isScanning}
+            detectedIngredients={detectedIngredients}
+            confirmedIngredients={confirmedIngredients}
+            setConfirmedIngredients={setConfirmedIngredients}
+            onStopScan={stopScan}
+            scanError={scanError}
+            videoRef={videoRef}
+            canvasRef={canvasRef}
+          />
+        )}
 
         {inlineValidationMessage && <ErrorMessage message={inlineValidationMessage} />}
 
