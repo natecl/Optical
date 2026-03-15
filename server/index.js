@@ -11,7 +11,9 @@ for (const envPath of envPaths) {
 }
 
 const healthRoutes = require('./routes/healthRoutes');
+const cookingRoutes = require('./routes/cookingRoutes');
 const { setupScanWebSocketServer } = require('./ws/scanServer');
+const { setupCookingLiveServer } = require('./ws/cookingLiveServer');
 
 const app = express();
 const PORT = 5000;
@@ -20,8 +22,10 @@ const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
 app.use('/api', healthRoutes);
+app.use('/api', cookingRoutes);
 
 setupScanWebSocketServer(server);
+setupCookingLiveServer(server);
 
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

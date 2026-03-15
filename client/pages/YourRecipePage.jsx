@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const renderList = (items) => {
   if (!Array.isArray(items) || items.length === 0) {
@@ -17,6 +17,7 @@ const renderList = (items) => {
 
 const YourRecipePage = () => {
   const { state } = useLocation();
+  const navigate = useNavigate();
   const recipe = state?.recipe;
 
   return (
@@ -51,6 +52,14 @@ const YourRecipePage = () => {
           <Link to="/" className="back-link">
             Back to home
           </Link>
+
+          <button
+            type="button"
+            className="submit-button"
+            onClick={() => navigate('/cooking', { state: { recipe } })}
+          >
+            Start Cooking
+          </button>
         </section>
       )}
     </main>
