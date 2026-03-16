@@ -17,7 +17,7 @@ This repository currently includes a **minimal local development setup** for fro
   - Method: `POST`
   - Path: `/api/recipe`
   - URL: `http://localhost:5000/api/recipe`
-- Backend recipe generation via ADK (`ramseyBot`) and Gemini
+- Backend recipe generation via ADK (`nanaBot`) and Gemini
 
 ### Example Request Body
 
@@ -54,6 +54,11 @@ npm run dev
 ```
 
 Then open `http://localhost:3000`.
+
+## Deployment
+
+- Backend production deploys are documented in `docs/deployment/google-cloud-mvp.md`.
+- Frontend production deploys to Vercel are documented in `docs/deployment/vercel-frontend.md`.
 
 ---
 

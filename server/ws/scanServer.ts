@@ -52,6 +52,23 @@ const recordDetections = (session: ScanSessionState, ingredients: string[], now:
   }
 };
 
+const SCAN_MSG_LIMIT_PER_SEC = 5;
+
+interface ScanRateLimiter {
+  count: number;
+  resetTime: number;
+}
+
+const checkScanRateLimit = (limiter: ScanRateLimiter): boolean => {
+  const now = Date.now();
+  if (now >= limiter.resetTime) {
+    limiter.count = 0;
+    limiter.resetTime = now + 1000;
+  }
+  limiter.count++;
+  return limiter.count <= SCAN_MSG_LIMIT_PER_SEC;
+};
+
 const sendJson = (socket: WebSocket, payload: ScanServerMessage): void => {
   if (socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify(payload));
@@ -60,12 +77,18 @@ const sendJson = (socket: WebSocket, payload: ScanServerMessage): void => {
 
 export const setupScanWebSocketServer = (): WebSocketServer => {
   const sessions = new Map<string, ScanSessionState>();
-  const wss = new WebSocketServer({ noServer: true });
+  const wss = new WebSocketServer({ noServer: true, maxPayload: 2 * 1024 * 1024 }); // 2MB for images
 
   wss.on('connection', (socket: WebSocket) => {
     const ownedSessionIds = new Set<string>();
+    const rateLimiter: ScanRateLimiter = { count: 0, resetTime: Date.now() + 1000 };
 
     socket.on('message', async (rawMessage: Buffer) => {
+      if (!checkScanRateLimit(rateLimiter)) {
+        sendJson(socket, { type: 'scan:error', error: 'Rate limit exceeded' });
+        return;
+      }
+
       let message: ScanClientMessage;
       try {
         message = JSON.parse(rawMessage.toString());

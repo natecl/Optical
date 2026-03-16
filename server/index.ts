@@ -30,7 +30,7 @@ const configuredOrigins = (process.env.CLIENT_URL || '')
   .map((origin) => origin.trim())
   .filter(Boolean);
 const ALLOWED_ORIGINS = configuredOrigins.length > 0 ? configuredOrigins : defaultOrigins;
-const vercelPreviewPattern = /^https:\/\/cook-mate-[a-z0-9-]+\.vercel\.app$/;
+const vercelPreviewPattern = /^https:\/\/cook-mate(-drab)?-[a-z0-9]{6,}(-[a-z0-9]+)*\.vercel\.app$/;
 
 if (isProd && configuredOrigins.length === 0) {
   throw new Error('CLIENT_URL must be set in production.');
@@ -58,7 +58,7 @@ app.use(cors({
 }));
 app.use(helmet());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 app.use((req, _res, next) => {
   console.log(`[HTTP] ${req.method} ${req.url}`);
   next();
@@ -71,6 +71,19 @@ const scanWss = setupScanWebSocketServer();
 const cookingWss = setupCookingLiveServer();
 
 server.on('upgrade', (req, socket, head) => {
+  const origin = req.headers.origin;
+
+  if (origin) {
+    const isAllowed =
+      ALLOWED_ORIGINS.includes(origin) || vercelPreviewPattern.test(origin);
+    if (!isAllowed) {
+      console.warn(`[WS Upgrade] Rejected origin: ${origin}`);
+      socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
+      socket.destroy();
+      return;
+    }
+  }
+
   const { pathname } = new URL(req.url!, `http://${req.headers.host}`);
   console.log(`[WS Upgrade] ${pathname}`);
 

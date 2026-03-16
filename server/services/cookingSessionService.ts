@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { CookingSessionError } from '../../types/errors';
 import type { SessionStatus, SessionEventType, CookingSession } from '../../types/session';
 import type { Recipe } from '../../types/recipe';
@@ -9,7 +10,19 @@ interface SessionEvent {
 
 type TransitionResult = CookingSession | { error: string };
 
+const MAX_SESSIONS = 100;
+const SESSION_TTL_MS = 60 * 60 * 1000; // 1 hour
+
 const sessions = new Map<string, CookingSession>();
+
+const pruneExpiredSessions = (): void => {
+  const now = Date.now();
+  for (const [id, session] of sessions.entries()) {
+    if (now - new Date(session.createdAt).getTime() > SESSION_TTL_MS) {
+      sessions.delete(id);
+    }
+  }
+};
 
 const VALID_TRANSITIONS: Record<SessionStatus, SessionEventType[]> = {
   idle: ['START_COOKING'],
@@ -116,8 +129,13 @@ export const createSession = (recipe: Recipe): CookingSession => {
     throw new CookingSessionError('instructions must be a non-empty array', 400);
   }
 
+  pruneExpiredSessions();
+  if (sessions.size >= MAX_SESSIONS) {
+    throw new CookingSessionError('Too many active sessions', 429);
+  }
+
   const now = new Date().toISOString();
-  const sessionId = `cook_${Date.now()}`;
+  const sessionId = `cook_${crypto.randomUUID()}`;
   const session: CookingSession = {
     sessionId,
     recipe,

@@ -5,59 +5,10 @@ import {
   isFinalResponse,
   stringifyContent
 } from '@google/adk';
+import crypto from 'crypto';
 import type { Recipe } from '../../../types/recipe';
 
-const BOOTSTRAP_APP_NAME = 'CookMate';
 const RUNNER_APP_NAME = 'Cookmate';
-const USER_ID = 'user_1';
-const SESSION_ID = 'recipe_session_1';
-
-let runtimePromise: Promise<{ runner: Runner }> | undefined;
-
-const createRuntime = async (): Promise<{ runner: Runner }> => {
-  const sessionService = new InMemorySessionService();
-
-  const ramseyBot = new LlmAgent({
-    name: 'ramseyBot',
-    model: 'gemini-2.5-flash-lite',
-    instruction: [
-      'You are a recipe assistant.',
-      'Return JSON only with exactly these keys: recipe_name, ingredients, instructions.',
-      'recipe_name must be a string.',
-      'ingredients must be an array of strings.',
-      'instructions must be an array of strings.'
-    ].join(' ')
-  });
-
-  await sessionService.createSession({
-    appName: BOOTSTRAP_APP_NAME,
-    userId: USER_ID,
-    sessionId: SESSION_ID,
-    state: { topic: 'recipes' }
-  });
-
-  await sessionService.getOrCreateSession({
-    appName: RUNNER_APP_NAME,
-    userId: USER_ID,
-    sessionId: SESSION_ID,
-    state: { topic: 'recipes' }
-  });
-
-  const runner = new Runner({
-    agent: ramseyBot,
-    appName: RUNNER_APP_NAME,
-    sessionService
-  });
-
-  return { runner };
-};
-
-const getRuntime = async (): Promise<{ runner: Runner }> => {
-  if (!runtimePromise) {
-    runtimePromise = createRuntime();
-  }
-  return runtimePromise;
-};
 
 const extractJsonString = (text: string): string => {
   const trimmed = text.trim();
@@ -112,7 +63,34 @@ const normalizeRecipeResponse = (responseText: string): Recipe => {
 };
 
 export const generateRecipeFromPrompt = async (prompt: string): Promise<Recipe> => {
-  const { runner } = await getRuntime();
+  const sessionService = new InMemorySessionService();
+  const userId = `user_${crypto.randomUUID()}`;
+  const sessionId = `recipe_${crypto.randomUUID()}`;
+
+  const nanaBot = new LlmAgent({
+    name: 'nanaBot',
+    model: 'gemini-2.5-flash-lite',
+    instruction: [
+      'You are a recipe assistant.',
+      'Return JSON only with exactly these keys: recipe_name, ingredients, instructions.',
+      'recipe_name must be a string.',
+      'ingredients must be an array of strings.',
+      'instructions must be an array of strings.'
+    ].join(' ')
+  });
+
+  await sessionService.createSession({
+    appName: RUNNER_APP_NAME,
+    userId,
+    sessionId,
+    state: { topic: 'recipes' }
+  });
+
+  const runner = new Runner({
+    agent: nanaBot,
+    appName: RUNNER_APP_NAME,
+    sessionService
+  });
 
   const newMessage = {
     role: 'user',
@@ -124,8 +102,8 @@ export const generateRecipeFromPrompt = async (prompt: string): Promise<Recipe> 
   };
 
   const events = runner.runAsync({
-    userId: USER_ID,
-    sessionId: SESSION_ID,
+    userId,
+    sessionId,
     newMessage
   });
 

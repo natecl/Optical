@@ -14,6 +14,30 @@ import type {
   ActiveCookingSession,
 } from '../../types/websocket';
 
+interface RateLimiter {
+  textCount: number;
+  binaryCount: number;
+  resetTime: number;
+}
+
+const TEXT_LIMIT_PER_SEC = 30;
+const BINARY_LIMIT_PER_SEC = 60;
+
+const checkRateLimit = (limiter: RateLimiter, isBinary: boolean): boolean => {
+  const now = Date.now();
+  if (now >= limiter.resetTime) {
+    limiter.textCount = 0;
+    limiter.binaryCount = 0;
+    limiter.resetTime = now + 1000;
+  }
+  if (isBinary) {
+    limiter.binaryCount++;
+    return limiter.binaryCount <= BINARY_LIMIT_PER_SEC;
+  }
+  limiter.textCount++;
+  return limiter.textCount <= TEXT_LIMIT_PER_SEC;
+};
+
 // Map cookingSessionId -> { geminiSession, clientSocket, currentStepIndex, recipe }
 const activeSessions = new Map<string, ActiveCookingSession>();
 const STEP_ILLUSTRATION_ERROR = 'Failed to generate illustration';
@@ -225,12 +249,20 @@ const cleanupSession = (cookingSessionId: string): void => {
 };
 
 export const setupCookingLiveServer = (): WebSocketServer => {
-  const wss = new WebSocketServer({ noServer: true });
+  const wss = new WebSocketServer({ noServer: true, maxPayload: 1 * 1024 * 1024 }); // 1MB max
 
   wss.on('connection', (socket: WebSocket) => {
     let currentCookingSessionId: string | null = null;
+    const rateLimiter: RateLimiter = { textCount: 0, binaryCount: 0, resetTime: Date.now() + 1000 };
 
     socket.on('message', async (rawMessage: Buffer, isBinary: boolean) => {
+      if (!checkRateLimit(rateLimiter, isBinary)) {
+        if (!isBinary) {
+          sendJson(socket, { type: 'live:error', error: 'Rate limit exceeded' });
+        }
+        return;
+      }
+
       // Binary messages are raw PCM audio from the client mic
       if (isBinary) {
         const entry = activeSessions.get(currentCookingSessionId!);

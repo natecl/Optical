@@ -1,8 +1,49 @@
-import { generateRecipeFromPrompt } from './agent/ramseyBotService';
+import { generateRecipeFromPrompt } from './agent/nanaBotRecipeService';
 import { normalizeIngredientList } from '../utils/ingredientNormalization';
 import { RecipeRequestError } from '../../types/errors';
 import type { Recipe } from '../../types/recipe';
 import type { RecipeRequestBody } from '../../types/api';
+import dns from 'dns/promises';
+import net from 'net';
+
+const BLOCKED_IP_RANGES = [
+  /^127\./,                    // loopback
+  /^10\./,                     // private class A
+  /^172\.(1[6-9]|2\d|3[01])\./, // private class B
+  /^192\.168\./,               // private class C
+  /^169\.254\./,               // link-local / cloud metadata
+  /^0\./,                      // current network
+  /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./, // carrier-grade NAT
+  /^::1$/,                     // IPv6 loopback
+  /^f[cd]/i,                   // IPv6 unique local
+  /^fe80/i,                    // IPv6 link-local
+];
+
+const BLOCKED_HOSTNAMES = ['metadata.google.internal', 'metadata.internal'];
+
+const isBlockedIp = (ip: string): boolean =>
+  BLOCKED_IP_RANGES.some((pattern) => pattern.test(ip));
+
+const validateUrlTarget = async (hostname: string): Promise<void> => {
+  if (BLOCKED_HOSTNAMES.includes(hostname.toLowerCase())) {
+    throw new RecipeRequestError('URL target is not allowed', 400);
+  }
+  if (net.isIP(hostname)) {
+    if (isBlockedIp(hostname)) {
+      throw new RecipeRequestError('URL target is not allowed', 400);
+    }
+    return;
+  }
+  const addresses = await dns.resolve4(hostname).catch(() => [] as string[]);
+  const addresses6 = await dns.resolve6(hostname).catch(() => [] as string[]);
+  const allAddresses = [...addresses, ...addresses6];
+  if (allAddresses.length === 0) {
+    throw new RecipeRequestError('Could not resolve URL hostname', 400);
+  }
+  if (allAddresses.every(isBlockedIp)) {
+    throw new RecipeRequestError('URL target is not allowed', 400);
+  }
+};
 
 const ALLOWED_MODES = new Set(['suggestion', 'import', 'ingredients']);
 
@@ -167,9 +208,11 @@ const preprocessImport = async (data: RecipeRequestBody['data']): Promise<string
     throw new RecipeRequestError('Invalid recipe URL', 400);
   }
 
+  await validateUrlTarget(parsedUrl.hostname);
+
   let html: string;
   try {
-    const response = await fetch(link);
+    const response = await fetch(link, { redirect: 'error' });
     if (!response.ok) {
       throw new Error(`Failed to fetch recipe page with status ${response.status}`);
     }
