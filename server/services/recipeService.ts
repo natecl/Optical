@@ -243,7 +243,12 @@ export const processRecipeRequest = async (body: unknown): Promise<Recipe> => {
 
   try {
     return await generateRecipeFromPrompt(prompt);
-  } catch (_error) {
+  } catch (error) {
+    console.error('[RecipeService] generation error:', error);
+    const status = (error as { status?: number }).status;
+    if (status === 429) {
+      throw new RecipeRequestError('Rate limit exceeded. Please try again in a minute.', 429);
+    }
     throw new RecipeRequestError('Recipe generation failed', 500);
   }
 };

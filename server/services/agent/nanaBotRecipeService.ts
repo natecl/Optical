@@ -1,14 +1,16 @@
-import {
-  InMemorySessionService,
-  LlmAgent,
-  Runner,
-  isFinalResponse,
-  stringifyContent
-} from '@google/adk';
-import crypto from 'crypto';
+import { GoogleGenAI } from '@google/genai';
 import type { Recipe } from '../../../types/recipe';
 
-const RUNNER_APP_NAME = 'Cookmate';
+const MODEL = 'gemini-2.5-flash-lite';
+
+const SYSTEM_INSTRUCTION = [
+  'You are a recipe assistant.',
+  'Return JSON only with exactly these keys: recipe_name, ingredients, instructions.',
+  'recipe_name must be a string.',
+  'ingredients must be an array of strings (e.g. "2 cups flour"), not objects.',
+  'instructions must be an array of strings.',
+  'Do not wrap the JSON in markdown code fences.'
+].join(' ');
 
 const extractJsonString = (text: string): string => {
   const trimmed = text.trim();
@@ -25,6 +27,18 @@ const extractJsonString = (text: string): string => {
   }
 
   return trimmed;
+};
+
+const stringifyIngredient = (item: unknown): string | null => {
+  if (typeof item === 'string') return item;
+  if (typeof item === 'object' && item !== null) {
+    const obj = item as Record<string, unknown>;
+    const parts = [obj.quantity, obj.item ?? obj.name, obj.notes]
+      .filter((v) => typeof v === 'string' && v.trim())
+      .map((v) => (v as string).trim());
+    return parts.length > 0 ? parts.join(' - ') : null;
+  }
+  return null;
 };
 
 const normalizeRecipeResponse = (responseText: string): Recipe => {
@@ -45,14 +59,16 @@ const normalizeRecipeResponse = (responseText: string): Recipe => {
     throw new Error('Agent response is missing required recipe fields');
   }
 
-  const ingredients = parsed.ingredients.filter((item: unknown) => typeof item === 'string');
+  const ingredients = parsed.ingredients
+    .map(stringifyIngredient)
+    .filter((v): v is string => v !== null);
   const instructions = instructionsValue
     .filter((item: unknown) => typeof item === 'string')
     .map((item: string) => item.trim())
     .filter(Boolean);
 
   if (ingredients.length === 0 || instructions.length === 0) {
-    throw new Error('Agent response includes no valid ingredients');
+    throw new Error('Agent response includes no valid ingredients or instructions');
   }
 
   return {
@@ -63,60 +79,26 @@ const normalizeRecipeResponse = (responseText: string): Recipe => {
 };
 
 export const generateRecipeFromPrompt = async (prompt: string): Promise<Recipe> => {
-  const sessionService = new InMemorySessionService();
-  const userId = `user_${crypto.randomUUID()}`;
-  const sessionId = `recipe_${crypto.randomUUID()}`;
-
-  const nanaBot = new LlmAgent({
-    name: 'nanaBot',
-    model: 'gemini-2.5-flash-lite',
-    instruction: [
-      'You are a recipe assistant.',
-      'Return JSON only with exactly these keys: recipe_name, ingredients, instructions.',
-      'recipe_name must be a string.',
-      'ingredients must be an array of strings.',
-      'instructions must be an array of strings.'
-    ].join(' ')
-  });
-
-  await sessionService.createSession({
-    appName: RUNNER_APP_NAME,
-    userId,
-    sessionId,
-    state: { topic: 'recipes' }
-  });
-
-  const runner = new Runner({
-    agent: nanaBot,
-    appName: RUNNER_APP_NAME,
-    sessionService
-  });
-
-  const newMessage = {
-    role: 'user',
-    parts: [
-      {
-        text: `${prompt}\nReturn JSON only with recipe_name, ingredients, instructions.`
-      }
-    ]
-  };
-
-  const events = runner.runAsync({
-    userId,
-    sessionId,
-    newMessage
-  });
-
-  let finalResponseText = '';
-  for await (const event of events) {
-    if (isFinalResponse(event)) {
-      finalResponseText = stringifyContent(event).trim();
-    }
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY or GOOGLE_GENAI_API_KEY is required');
   }
 
-  if (!finalResponseText) {
-    throw new Error('Agent returned no final response text');
+  const ai = new GoogleGenAI({ apiKey });
+
+  const response = await ai.models.generateContent({
+    model: MODEL,
+    contents: `${prompt}\nReturn JSON only with recipe_name, ingredients, instructions.`,
+    config: {
+      systemInstruction: SYSTEM_INSTRUCTION,
+      responseMimeType: 'application/json',
+    },
+  });
+
+  const responseText = response.text?.trim();
+  if (!responseText) {
+    throw new Error('Model returned no response text');
   }
 
-  return normalizeRecipeResponse(finalResponseText);
+  return normalizeRecipeResponse(responseText);
 };
