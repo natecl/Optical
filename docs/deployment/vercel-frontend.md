@@ -52,8 +52,7 @@ The workflow:
 1. Checks out the repo
 2. Installs client dependencies
 3. Pulls Vercel production settings into the workflow runner
-4. Builds the frontend with `vercel build --prod`
-5. Deploys the prebuilt output with `vercel deploy --prebuilt --prod`
+4. Triggers a production deploy with `vercel deploy --prod`
 
 Because the deploy is tied to the pushed commit on `main`, reverting or force-pushing `main` to an older commit will redeploy that older frontend version on the next successful workflow run.
 
