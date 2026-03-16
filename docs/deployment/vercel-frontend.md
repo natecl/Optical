@@ -54,6 +54,8 @@ The workflow:
 3. Pulls Vercel production settings into the workflow runner
 4. Triggers a production deploy with `vercel deploy --prod`
 
+The frontend also includes `client/vercel.json`, which rewrites deep links like `/cooking` back to the SPA entrypoint so browser refreshes do not 404 on React Router routes.
+
 Because the deploy is tied to the pushed commit on `main`, reverting or force-pushing `main` to an older commit will redeploy that older frontend version on the next successful workflow run.
 
 ## 4) Post-deploy verification

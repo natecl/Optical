@@ -4,6 +4,14 @@ import type { Recipe } from '../../types/recipe';
 import { useCookingSession } from '../hooks/useCookingSession';
 import { useCookingCamera } from '../hooks/useCookingCamera';
 import { useNanaBot } from '../hooks/useNanaBot';
+import {
+  buildCookingPath,
+  clearPersistedCookingSessionId,
+  getResumableSessionId,
+  persistCookingSessionId,
+  readPersistedCookingSessionId,
+  shouldResumeCookingSession,
+} from '../hooks/useCookingSessionPersistence';
 import ErrorMessage from '../components/ErrorMessage';
 
 interface VoiceWaveProps {
@@ -36,14 +44,17 @@ const VoiceWave = ({ audioLevel, isModelSpeaking }: VoiceWaveProps) => {
 };
 
 const CookingPage = () => {
-  const { state } = useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
-  const recipe = (state as { recipe?: Recipe } | null)?.recipe;
+  const recipe = (location.state as { recipe?: Recipe } | null)?.recipe;
+  const resumableSessionId = getResumableSessionId(location.search, readPersistedCookingSessionId());
+  const shouldResumeSession = shouldResumeCookingSession(resumableSessionId, Boolean(recipe));
   const {
     session,
     loading,
     error,
     createSession,
+    loadSession,
     startCooking,
     nextStep,
     previousStep,
@@ -78,24 +89,51 @@ const CookingPage = () => {
   } = useNanaBot();
 
   useEffect(() => {
-    if (!recipe) return;
+    if (session?.sessionId) {
+      return;
+    }
+
+    if (!recipe && !shouldResumeSession) {
+      return;
+    }
 
     let cancelled = false;
 
     const init = async () => {
-      const created = await createSession(recipe);
-      if (cancelled || !created) return;
+      let activeSession = shouldResumeSession && resumableSessionId
+        ? await loadSession(resumableSessionId)
+        : await createSession(recipe as Recipe);
+      if (cancelled || !activeSession) {
+        if (shouldResumeSession) {
+          clearPersistedCookingSessionId();
+        }
+        return;
+      }
 
-      const started = await startCooking(created.sessionId);
-      if (cancelled) return;
+      persistCookingSessionId(activeSession.sessionId);
+
+      const expectedPath = buildCookingPath(activeSession.sessionId);
+      if (`${location.pathname}${location.search}` !== expectedPath) {
+        navigate(expectedPath, {
+          replace: true,
+          state: recipe ? { recipe } : undefined
+        });
+      }
+
+      if (activeSession.status === 'idle') {
+        const startedSession = await startCooking(activeSession.sessionId);
+        if (cancelled || !startedSession) return;
+        activeSession = startedSession;
+      }
+
+      if (activeSession.status === 'completed') {
+        return;
+      }
 
       await startCamera();
       if (cancelled) return;
 
-      // Auto-start NanaBot after cooking session and camera are ready
-      if (started) {
-        startVoiceSession(created.sessionId, videoRef);
-      }
+      startVoiceSession(activeSession.sessionId, videoRef);
     };
     init();
 
@@ -104,20 +142,37 @@ const CookingPage = () => {
       stopTracks();
       stopVoiceSession();
     };
-  }, []);
+  }, [
+    createSession,
+    loadSession,
+    location.pathname,
+    location.search,
+    navigate,
+    recipe,
+    session?.sessionId,
+    shouldResumeSession,
+    startCamera,
+    startCooking,
+    startVoiceSession,
+    stopTracks,
+    stopVoiceSession,
+    resumableSessionId,
+    videoRef
+  ]);
 
   const currentIndex = session?.currentStepIndex ?? 0;
+  const activeRecipe = session?.recipe || recipe;
 
-  if (!recipe) {
+  if (!activeRecipe) {
     return (
       <main className="container">
-        <p>No recipe loaded. Please generate a recipe first.</p>
+        <p>{error || 'No recipe loaded. Please generate a recipe first.'}</p>
         <Link to="/" className="back-link">Back to home</Link>
       </main>
     );
   }
 
-  const instructions = session?.recipe?.instructions || recipe.instructions || [];
+  const instructions = session?.recipe?.instructions || activeRecipe.instructions || [];
   const stepCompletion = session?.stepCompletion || [];
   const totalSteps = instructions.length;
   const currentStepText = instructions[currentIndex] || '';
@@ -140,8 +195,9 @@ const CookingPage = () => {
   const handleFinish = async () => {
     stopVoiceSession();
     await finishSession();
+    clearPersistedCookingSessionId();
     stopTracks();
-    navigate('/your-recipe', { state: { recipe } });
+    navigate('/your-recipe', { state: { recipe: activeRecipe } });
   };
 
   const displayError = error || cameraError || nanaError;
