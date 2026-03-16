@@ -190,6 +190,7 @@ GOOGLE_API_KEY=
 - `2026-03-09`: AGENTS.md must be updated when tasks introduce durable architecture or deployment context.
 - `2026-03-10`: Security hardening applied — helmet, rate-limiting, CORS restrictions, secret scrubbing.
 - `2026-03-14`: Tech stack migrated to TypeScript throughout. Server runs via `tsx`. Shared types at `types/`.
+- `2026-03-16`: Production deployment path uses Google Cloud Run for backend hosting with GitHub Actions auto-deploy (`main`) via Workload Identity Federation (no static service-account keys).
 
 ## Definition of Done
 
@@ -214,3 +215,83 @@ A task is done only when:
 8. Leave the codebase cleaner than you found it
 
 If a requested change conflicts with this file, follow this file unless the human maintainer explicitly overrides.
+
+## AI Agent Skills
+
+Reusable skill documents are available at `.claude/skills/` for any AI agent working on this project. These provide structured workflows, processes, and guidelines that agents should reference when applicable.
+
+### Skills Directory
+
+```
+.claude/skills/
+├── superpowers/                        # Core development workflow skills
+│   ├── brainstorming/                  # Design ideation before implementation
+│   │   ├── SKILL.md                    # Main brainstorming process
+│   │   ├── spec-document-reviewer-prompt.md
+│   │   └── visual-companion.md         # Browser-based visual brainstorming
+│   ├── dispatching-parallel-agents/    # Run independent tasks concurrently
+│   ├── executing-plans/                # Execute written implementation plans
+│   ├── finishing-a-development-branch/ # Merge, PR, or cleanup after implementation
+│   ├── receiving-code-review/          # Evaluate review feedback with rigor
+│   ├── requesting-code-review/         # Dispatch code review subagents
+│   │   ├── SKILL.md
+│   │   └── code-reviewer.md            # Review agent prompt template
+│   ├── subagent-driven-development/    # Execute plans via subagents with two-stage review
+│   │   ├── SKILL.md
+│   │   ├── implementer-prompt.md
+│   │   ├── spec-reviewer-prompt.md
+│   │   └── code-quality-reviewer-prompt.md
+│   ├── systematic-debugging/           # 4-phase root cause debugging
+│   │   ├── SKILL.md
+│   │   ├── condition-based-waiting.md
+│   │   ├── defense-in-depth.md
+│   │   └── root-cause-tracing.md
+│   ├── test-driven-development/        # TDD: RED-GREEN-REFACTOR cycle
+│   │   ├── SKILL.md
+│   │   └── testing-anti-patterns.md
+│   ├── using-git-worktrees/            # Isolated workspaces for feature work
+│   ├── using-superpowers/              # Meta-skill: when/how to invoke skills
+│   ├── verification-before-completion/ # Evidence before success claims
+│   ├── writing-plans/                  # Create implementation plans from specs
+│   │   ├── SKILL.md
+│   │   └── plan-document-reviewer-prompt.md
+│   └── writing-skills/                 # Create and test new skills (TDD for docs)
+│       ├── SKILL.md
+│       ├── anthropic-best-practices.md
+│       ├── persuasion-principles.md
+│       └── testing-skills-with-subagents.md
+├── code-review/
+│   └── code-review.md                  # Automated PR code review with parallel agents
+├── frontend-design/
+│   └── SKILL.md                        # Distinctive, production-grade UI design
+└── security-guidance/
+    └── SKILL.md                        # Secure coding patterns for Express/TypeScript
+```
+
+### When to Use Skills
+
+| Skill | Use When |
+|-------|----------|
+| **brainstorming** | Before any creative work — creating features, components, or modifying behavior |
+| **systematic-debugging** | Encountering any bug, test failure, or unexpected behavior |
+| **test-driven-development** | Implementing any feature or bugfix, before writing implementation code |
+| **writing-plans** | You have a spec or requirements for a multi-step task |
+| **executing-plans** | You have a written plan to execute in a separate session |
+| **subagent-driven-development** | Executing plans with independent tasks in the current session |
+| **dispatching-parallel-agents** | Facing 2+ independent tasks with no shared state |
+| **requesting-code-review** | Completing tasks, major features, or before merging |
+| **receiving-code-review** | Receiving review feedback, especially if unclear or questionable |
+| **finishing-a-development-branch** | Implementation complete, deciding how to integrate |
+| **using-git-worktrees** | Starting feature work that needs isolation |
+| **verification-before-completion** | About to claim work is complete or passing |
+| **frontend-design** | Building web components, pages, or applications with high design quality |
+| **code-review** | Reviewing a pull request for bugs, CLAUDE.md compliance, and code quality |
+| **security-guidance** | Modifying endpoints, handling input, file uploads, secrets, middleware, or adding routes |
+
+### How to Use
+
+Agents should read the relevant `SKILL.md` file before starting applicable work. Each skill contains:
+- **When to use** — triggering conditions
+- **Process** — step-by-step workflow
+- **Red flags** — common mistakes to avoid
+- **Integration** — how skills connect to each other

@@ -20,14 +20,36 @@ import { setupScanWebSocketServer } from './ws/scanServer';
 import { setupCookingLiveServer } from './ws/cookingLiveServer';
 
 const app = express();
-const PORT = 5000;
+const PORT = Number(process.env.PORT) || 5000;
 const server = http.createServer(app);
 
-const ALLOWED_ORIGINS = [
-  'http://localhost:3000',
-  'http://localhost:5000',
-];
-app.use(cors({ origin: ALLOWED_ORIGINS }));
+const isProd = process.env.NODE_ENV === 'production';
+const defaultOrigins = ['http://localhost:3000', 'http://localhost:5000'];
+const configuredOrigins = (process.env.CLIENT_URL || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const ALLOWED_ORIGINS = configuredOrigins.length > 0 ? configuredOrigins : defaultOrigins;
+
+if (isProd && configuredOrigins.length === 0) {
+  throw new Error('CLIENT_URL must be set in production.');
+}
+
+app.disable('x-powered-by');
+app.use(cors({
+  origin(origin, callback) {
+    // Allow same-origin/non-browser requests with no Origin header.
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+    if (ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
+}));
 app.use(helmet());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 app.use(express.json());
