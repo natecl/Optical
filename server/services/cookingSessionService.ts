@@ -46,7 +46,14 @@ const transition = (session: CookingSession, event: SessionEvent): TransitionRes
 
     case 'PREVIOUS_STEP': {
       const prevIndex = Math.max(session.currentStepIndex - 1, 0);
-      return { ...session, currentStepIndex: prevIndex, updatedAt: now };
+      const newCompletion = [...session.stepCompletion];
+      newCompletion[prevIndex] = false;
+      return {
+        ...session,
+        currentStepIndex: prevIndex,
+        stepCompletion: newCompletion,
+        updatedAt: now
+      };
     }
 
     case 'MARK_STEP_COMPLETE': {

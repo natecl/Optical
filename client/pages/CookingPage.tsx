@@ -133,6 +133,10 @@ const CookingPage = () => {
   const allComplete = stepCompletion.length > 0 && stepCompletion.every(Boolean);
 
   const handleCompleteStep = async () => {
+    if (stepCompletion[currentIndex]) {
+      await nextStep();
+      return;
+    }
     await completeStep();
   };
 
@@ -273,9 +277,9 @@ const CookingPage = () => {
               type="button"
               className="submit-button"
               onClick={handleCompleteStep}
-              disabled={loading || stepCompletion[currentIndex]}
+              disabled={loading}
             >
-              {stepCompletion[currentIndex] ? 'Completed' : 'Complete Step'}
+              {stepCompletion[currentIndex] ? 'Continue' : 'Complete Step'}
             </button>
           )}
         </div>
