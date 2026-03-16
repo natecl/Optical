@@ -1,6 +1,6 @@
 # Google Cloud MVP Deployment (Backend)
 
-This guide deploys the CookMate backend to Google Cloud Run with automated deploys from GitHub Actions on every push to `main`.
+This guide deploys the CookMate backend to Google Cloud Run with automated deploys from GitHub Actions on every push to `main`, plus manual deploys through GitHub Actions when needed.
 
 ## Scope
 
@@ -8,6 +8,7 @@ This guide deploys the CookMate backend to Google Cloud Run with automated deplo
 - Public Cloud Run endpoint (MVP)
 - GitHub Actions + Workload Identity Federation (no long-lived service account keys)
 - Full backend flow, including WebSocket paths (`/ws/cooking-live`, `/ws/scan`)
+- Manual production deploys via GitHub Actions `workflow_dispatch`
 
 ## 1) One-time GCP setup
 
@@ -136,6 +137,8 @@ Deployment is automated on push to `main` using:
 
 Cloud Run timeout is set to `3600` seconds for long-lived live cooking sessions.
 
+Manual production deploys are also available from the GitHub Actions UI through `workflow_dispatch`. This is useful when you need to redeploy the current `main` commit without creating a new commit.
+
 ## 5) Post-deploy verification
 
 Get URL:
@@ -158,7 +161,24 @@ Expected:
 { "status": "success", "message": "frontend and backend connected" }
 ```
 
-## 6) Proof package for requirement
+If you launched the deploy manually, verify the GitHub Actions run page shows the expected commit SHA before checking Cloud Run.
+
+## 6) Rollback checklist
+
+Use this when production needs to return to an older backend commit.
+
+1. Identify the last known good commit on `main`
+2. Decide rollback method:
+   - Use `workflow_dispatch` if the good commit is already the current `main` HEAD and you only need to redeploy it
+   - Revert or force-push `main` to the older commit if production must run older code than the current branch tip
+3. Confirm the GitHub Actions run is deploying the expected commit SHA
+4. Wait for the Cloud Run revision to finish deploying
+5. Verify `GET /api/health` on the Cloud Run service URL
+6. Smoke-test one API flow and one WebSocket flow
+7. Confirm Cloud Run logs no longer show the original failure mode
+8. Record which commit was rolled back and why
+
+## 7) Proof package for requirement
 
 ### A) Screen recording proof (required)
 
@@ -177,7 +197,7 @@ Include links/screenshots to:
 - `scripts/gcp/deploy-cloud-run.sh`
 - `server/services/agent/nanabotService.ts` and `server/services/vision/*` showing Google AI service usage
 
-## 7) Security notes
+## 8) Security notes
 
 - Workload Identity Federation is used instead of service account JSON keys.
 - CORS is explicit via `CLIENT_URL` allowlist.

@@ -191,6 +191,8 @@ GOOGLE_API_KEY=
 - `2026-03-10`: Security hardening applied — helmet, rate-limiting, CORS restrictions, secret scrubbing.
 - `2026-03-14`: Tech stack migrated to TypeScript throughout. Server runs via `tsx`. Shared types at `types/`.
 - `2026-03-16`: Production deployment path uses Google Cloud Run for backend hosting with GitHub Actions auto-deploy (`main`) via Workload Identity Federation (no static service-account keys).
+- `2026-03-16`: Backend production deploy workflow also supports GitHub Actions manual dispatch for redeploys and rollback operations.
+- `2026-03-16`: Frontend production deployment uses Vercel with GitHub Actions auto-deploy on `main` for `client/**` and `types/**`; Vercel project root must remain `client`.
 
 ## Definition of Done
 

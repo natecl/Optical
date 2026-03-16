@@ -8,6 +8,7 @@ on:
       - 'server/**'
       - 'types/**'
       - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
