@@ -131,7 +131,6 @@ Deployment is automated on push to `main` using:
 - Target: Cloud Run service in `us-central1`
 - Runtime env:
   - `NODE_ENV=production`
-  - `PORT=8080`
   - `CLIENT_URL=<GitHub variable>`
   - `GEMINI_API_KEY=<GitHub secret>`
 

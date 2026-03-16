@@ -23,7 +23,7 @@ gcloud run deploy "$CLOUD_RUN_SERVICE" \
   --allow-unauthenticated \
   --port 8080 \
   --timeout 3600 \
-  --set-env-vars "NODE_ENV=production,PORT=8080,CLIENT_URL=${CLIENT_URL},GEMINI_API_KEY=${GEMINI_API_KEY}"
+  --set-env-vars "NODE_ENV=production,CLIENT_URL=${CLIENT_URL},GEMINI_API_KEY=${GEMINI_API_KEY}"
 
 gcloud run services describe "$CLOUD_RUN_SERVICE" \
   --region "$GCP_REGION" \
