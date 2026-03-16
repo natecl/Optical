@@ -127,7 +127,7 @@ Set repository secret:
 Deployment is automated on push to `main` using:
 
 - Workflow: `.github/workflows/deploy-backend.yml`
-- Build context: `server/`
+- Build context: repository root (`.`) using `server/Dockerfile` so shared root `types/` are included
 - Target: Cloud Run service in `us-central1`
 - Runtime env:
   - `NODE_ENV=production`

@@ -13,7 +13,7 @@ IMAGE_URI="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GAR_REPO}/cookmate-b
 gcloud config set project "$GCP_PROJECT_ID"
 gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
 
-docker build -t "$IMAGE_URI" ./server
+docker build -f ./server/Dockerfile -t "$IMAGE_URI" .
 docker push "$IMAGE_URI"
 
 gcloud run deploy "$CLOUD_RUN_SERVICE" \
