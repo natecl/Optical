@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import type { Recipe } from '../../../types/recipe';
 
-const MODEL = 'gemini-2.5-flash-lite';
+const MODEL = 'gemini-2.5-flash';
 
 const SYSTEM_INSTRUCTION = [
   'You are a recipe assistant.',

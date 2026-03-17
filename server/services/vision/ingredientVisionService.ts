@@ -4,7 +4,7 @@ import {
   normalizeIngredientName
 } from '../../utils/ingredientNormalization';
 
-const MODEL_NAME = 'gemini-2.5-flash-lite';
+const MODEL_NAME = 'gemini-2.5-flash';
 const PROMPT = [
   'Identify food ingredients visible in the image.',
   'Return a JSON array of ingredient names.',
