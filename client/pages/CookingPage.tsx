@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import type { Recipe } from '../../types/recipe';
 import { useCookingSession } from '../hooks/useCookingSession';
@@ -84,8 +84,10 @@ const CookingPage = () => {
     notifyStepChange: notifyBotStepChange,
   } = useNanaBot();
 
+  const initRef = useRef(false);
+
   useEffect(() => {
-    if (session?.sessionId) {
+    if (initRef.current) {
       return;
     }
 
@@ -93,13 +95,16 @@ const CookingPage = () => {
       return;
     }
 
+    initRef.current = true;
     let cancelled = false;
 
     const init = async () => {
-      let activeSession = shouldResumeSession && resumableSessionId
+      // Use existing session if available (e.g. React Strict Mode second run)
+      let activeSession = session || (shouldResumeSession && resumableSessionId
         ? await loadSession(resumableSessionId)
-        : await createSession(recipe as Recipe);
+        : await createSession(recipe as Recipe));
       if (cancelled || !activeSession) {
+        initRef.current = false;
         if (shouldResumeSession) {
           clearPersistedCookingSessionId();
         }
@@ -110,15 +115,19 @@ const CookingPage = () => {
 
       const expectedPath = buildCookingPath(activeSession.sessionId);
       if (`${location.pathname}${location.search}` !== expectedPath) {
-        navigate(expectedPath, {
-          replace: true,
-          state: recipe ? { recipe } : undefined
-        });
+        window.history.replaceState(
+          recipe ? { recipe } : null,
+          '',
+          expectedPath
+        );
       }
 
       if (activeSession.status === 'idle') {
         const startedSession = await startCooking(activeSession.sessionId);
-        if (cancelled || !startedSession) return;
+        if (cancelled || !startedSession) {
+          initRef.current = false;
+          return;
+        }
         activeSession = startedSession;
       }
 
@@ -135,26 +144,19 @@ const CookingPage = () => {
 
     return () => {
       cancelled = true;
+      initRef.current = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Cleanup camera and voice on unmount only
+  useEffect(() => {
+    return () => {
       stopTracks();
       stopVoiceSession();
     };
-  }, [
-    createSession,
-    loadSession,
-    location.pathname,
-    location.search,
-    navigate,
-    recipe,
-    session?.sessionId,
-    shouldResumeSession,
-    startCamera,
-    startCooking,
-    startVoiceSession,
-    stopTracks,
-    stopVoiceSession,
-    resumableSessionId,
-    videoRef
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const currentIndex = session?.currentStepIndex ?? 0;
   const activeRecipe = session?.recipe || recipe;

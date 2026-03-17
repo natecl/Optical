@@ -330,7 +330,9 @@ export const useNanaBot = () => {
             setIsModelSpeaking(false);
           } else if (msg.type === 'live:interrupted') {
             // Server interrupted Gemini's turn — flush queued audio immediately
+            // then reset the flag so new-turn audio from the next step plays
             flushAudioPlayback();
+            pendingInterruptionRef.current = false;
           } else if (msg.type === 'live:error') {
             setError(msg.error || 'Voice agent error');
           }

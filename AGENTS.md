@@ -295,3 +295,6 @@ Agents should read the relevant `SKILL.md` file before starting applicable work.
 - **Process** — step-by-step workflow
 - **Red flags** — common mistakes to avoid
 - **Integration** — how skills connect to each other
+
+### Best Practices
+After plan is created and the user accepts the plan clear context to reduce context rot.
