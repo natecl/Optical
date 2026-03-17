@@ -5,7 +5,7 @@ import type { IllustrationResult } from '../../../types/illustration';
 
 const IMAGE_MODEL = 'gemini-2.5-flash-image';
 const STYLE_PREFIX =
-  'A warm, inviting cooking illustration in a clean editorial vector style with soft gradients and natural shadows. Use a warm earthy color palette of browns, greens, creams, terracotta, and gold. The composition should feel like a premium cookbook illustration — instructional, clear, and beautifully composed. No text, no labels, no watermarks. Scene:';
+  'A detailed, charming 3D cartoon cooking illustration in an isometric perspective, like a high-quality animated movie still. Objects should look three-dimensional with rounded, tactile forms — plump vegetables, glossy sauces, chunky wooden cutting boards with visible grain, gleaming stainless steel knives. Use soft volumetric lighting with gentle shadows and ambient occlusion to give depth. The style should be stylized and friendly but highly descriptive and instructional — clearly showing the exact technique, hand positions, ingredient quantities, and tool angles so a beginner cook can follow along. Use a warm earthy color palette of rich browns, vibrant greens, soft creams, terracotta, and golden highlights. Every ingredient and tool should be clearly identifiable and accurately proportioned. No text, no labels, no watermarks. Scene:';
 
 const FRAME_COUNT = 3;
 const GIF_DELAY = 900;
@@ -45,8 +45,6 @@ interface DecodedPngFrame {
 type ImageGenerator = (prompt: string) => Promise<StillImageResult | null>;
 type SceneKind = 'cut' | 'mix' | 'pour' | 'heat' | 'knead' | 'plate';
 
-const cache = new Map<string, IllustrationResult>();
-const MAX_CACHE = 50;
 let client: GoogleGenAI | undefined;
 let imageGeneratorOverride: ImageGenerator | null = null;
 let remoteImageGenerationDisabled = false;
@@ -380,36 +378,18 @@ function renderFallbackMotion(stepText: string): IllustrationResult {
   return { data: renderFallbackStill(stepText).toString('base64'), format: 'png' };
 }
 
-function cacheResult(cacheKey: string | undefined, result: IllustrationResult): void {
-  if (!cacheKey) {
-    return;
-  }
-  if (cache.size >= MAX_CACHE) {
-    const oldest = cache.keys().next().value;
-    if (oldest !== undefined) {
-      cache.delete(oldest);
-    }
-  }
-  cache.set(cacheKey, result);
-}
-
-export async function generateStepIllustration(stepText: string, cacheKey?: string): Promise<IllustrationResult | null> {
-  if (cacheKey && cache.has(cacheKey)) {
-    console.log('[IllustrationService] Cache hit:', cacheKey);
-    return cache.get(cacheKey)!;
-  }
-
+export async function generateStepIllustration(stepText: string): Promise<IllustrationResult | null> {
   console.log('[IllustrationService] Generating for step:', stepText);
   const motion = isMotionStep(stepText);
   let result: IllustrationResult | null = null;
 
   if (motion) {
     console.log('[IllustrationService] Motion step detected, generating', FRAME_COUNT, 'frames');
-    const sceneContext = `"${stepText}". Warm editorial vector style with soft gradients, earthy color palette (browns, greens, creams, terracotta, gold), natural shadows, consistent isometric camera angle. No text or labels.`;
+    const sceneContext = `"${stepText}". Detailed 3D cartoon style with rounded tactile forms, soft volumetric lighting, gentle shadows, isometric camera angle. Warm earthy palette (rich browns, vibrant greens, soft creams, terracotta, gold). Clearly show the technique so a beginner can follow. No text or labels.`;
     const prompts = [
-      `Frame 1 of ${FRAME_COUNT}: The very beginning — ${sceneContext} Show ingredients and tools positioned ready on the surface, before the action starts. This establishes the scene composition that must stay identical across all frames.`,
-      `Frame 2 of ${FRAME_COUNT}: Midway through — ${sceneContext} The technique is actively in progress. Maintain the identical background, lighting, and camera angle from frame 1. Only the action element changes position.`,
-      `Frame 3 of ${FRAME_COUNT}: Nearly complete — ${sceneContext} The result is taking shape. Maintain the identical background, lighting, and camera angle from previous frames. Only the action element shows the final state.`,
+      `Frame 1 of ${FRAME_COUNT}: The very beginning — ${sceneContext} Show all ingredients and tools positioned on the surface, ready for the action to start. Ingredients should be clearly identifiable with accurate proportions. This establishes the exact scene composition, lighting, and camera angle that must stay identical across all frames.`,
+      `Frame 2 of ${FRAME_COUNT}: Midway through the action — ${sceneContext} The cooking technique is actively in progress, showing the motion clearly. Maintain the identical background, lighting, surface, and camera angle from frame 1. Only the hands, tool, or ingredient being acted upon changes position.`,
+      `Frame 3 of ${FRAME_COUNT}: Nearly complete — ${sceneContext} The result of the technique is clearly visible and taking shape. Maintain the identical background, lighting, surface, and camera angle from previous frames. Only the action element shows the final transformed state.`,
     ];
 
     const frames = await Promise.all(prompts.map((prompt) => generateSingleImage(prompt)));
@@ -438,7 +418,6 @@ export async function generateStepIllustration(stepText: string, cacheKey?: stri
     }
   }
 
-  cacheResult(cacheKey, result);
   console.log('[IllustrationService] Generated:', result.format, '~' + Math.round(result.data.length / 1024) + 'KB');
   return result;
 }
@@ -453,9 +432,6 @@ export async function generateClarifyIllustration(description: string): Promise<
 }
 
 export const __testing = {
-  clearCache(): void {
-    cache.clear();
-  },
   setImageGeneratorOverride(generator: ImageGenerator | null): void {
     imageGeneratorOverride = generator;
   },

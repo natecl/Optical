@@ -18,18 +18,29 @@ const createPngBuffer = (rgba: [number, number, number, number]): Buffer => {
 };
 
 test.beforeEach(() => {
-  illustrationTesting.clearCache();
   illustrationTesting.setImageGeneratorOverride(null);
   illustrationTesting.setRemoteImageGenerationDisabled(false);
 });
 
 test.afterEach(() => {
-  illustrationTesting.clearCache();
   illustrationTesting.setImageGeneratorOverride(null);
   illustrationTesting.setRemoteImageGenerationDisabled(false);
 });
 
-test('generateStepIllustration returns cached PNG for static steps', async () => {
+test('generateStepIllustration returns PNG for static steps', async () => {
+  const png = createPngBuffer([255, 0, 0, 255]);
+
+  illustrationTesting.setImageGeneratorOverride(async () => {
+    return { buffer: png, format: 'png' };
+  });
+
+  const result = await generateStepIllustration('Let the dough rest');
+
+  assert.equal(result?.format, 'png');
+  assert.equal(result?.data, png.toString('base64'));
+});
+
+test('generateStepIllustration generates fresh illustration every call', async () => {
   const png = createPngBuffer([255, 0, 0, 255]);
   let callCount = 0;
 
@@ -38,13 +49,10 @@ test('generateStepIllustration returns cached PNG for static steps', async () =>
     return { buffer: png, format: 'png' };
   });
 
-  const first = await generateStepIllustration('Let the dough rest', 'static-cache');
-  const second = await generateStepIllustration('Let the dough rest', 'static-cache');
+  await generateStepIllustration('Let the dough rest');
+  await generateStepIllustration('Let the dough rest');
 
-  assert.equal(first?.format, 'png');
-  assert.equal(first?.data, png.toString('base64'));
-  assert.deepEqual(second, first);
-  assert.equal(callCount, 1);
+  assert.equal(callCount, 2);
 });
 
 test('generateStepIllustration returns GIF for motion steps with valid frames', async () => {

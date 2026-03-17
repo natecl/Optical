@@ -42,16 +42,6 @@ const checkRateLimit = (limiter: RateLimiter, isBinary: boolean): boolean => {
 const activeSessions = new Map<string, ActiveCookingSession>();
 const STEP_ILLUSTRATION_ERROR = 'Failed to generate illustration';
 
-/**
- * Pre-fetch the next step's illustration in the background (cache-only, no WS message).
- */
-const prefetchNextStep = (cookingSessionId: string, currentStepIndex: number, recipe: Recipe): void => {
-  const nextIndex = currentStepIndex + 1;
-  if (nextIndex >= recipe.instructions.length) return;
-  const nextStepText = recipe.instructions[nextIndex];
-  const cacheKey = `${cookingSessionId}:${nextIndex}`;
-  generateStepIllustration(nextStepText, cacheKey).catch(() => {});
-};
 
 const sendJson = (socket: WebSocket, payload: CookingLiveServerMessage): void => {
   if (socket.readyState === WebSocket.OPEN) {
@@ -73,7 +63,6 @@ interface StepIllustrationRequest {
   recipe: Recipe;
   getEntry: () => ActiveCookingSession | undefined;
   generateIllustration?: typeof generateStepIllustration;
-  prefetchIllustration?: typeof prefetchNextStep;
 }
 
 const emitStepIllustrationPayload = (
@@ -100,19 +89,16 @@ const emitStepIllustrationError = (socket: WebSocket): void => {
 
 const requestStepIllustration = async ({
   socket,
-  cookingSessionId,
   stepIndex,
   stepText,
-  recipe,
   getEntry,
   generateIllustration = generateStepIllustration,
-  prefetchIllustration = prefetchNextStep,
 }: StepIllustrationRequest): Promise<void> => {
   sendJson(socket, { type: 'live:illustration_loading', context: 'step' });
 
   let result: IllustrationResult | null = null;
   try {
-    result = await generateIllustration(stepText, `${cookingSessionId}:${stepIndex}`);
+    result = await generateIllustration(stepText);
   } catch (err) {
     console.error('[NanaBot] Step illustration error:', (err as Error).message);
   }
@@ -127,8 +113,6 @@ const requestStepIllustration = async ({
   } else {
     emitStepIllustrationError(socket);
   }
-
-  prefetchIllustration(cookingSessionId, stepIndex, recipe);
 };
 
 const handleToolCall = async (entry: ActiveCookingSession, message: GeminiLiveMessage): Promise<void> => {

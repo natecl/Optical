@@ -47,7 +47,6 @@ test('requestStepIllustration emits loading and error when generation returns nu
     recipe,
     getEntry: () => createEntry(0),
     generateIllustration: async () => null,
-    prefetchIllustration: () => {},
   });
 
   assert.deepEqual(
@@ -69,7 +68,6 @@ test('requestStepIllustration emits loading and error when generation throws', a
     generateIllustration: async () => {
       throw new Error('boom');
     },
-    prefetchIllustration: () => {},
   });
 
   assert.deepEqual(
@@ -89,7 +87,6 @@ test('requestStepIllustration emits loading and image when generation succeeds',
     recipe,
     getEntry: () => createEntry(0),
     generateIllustration: async () => ({ data: 'abc123', format: 'png' }),
-    prefetchIllustration: () => {},
   });
 
   assert.deepEqual(
