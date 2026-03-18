@@ -195,7 +195,7 @@ const CookingPage = () => {
     await finishSession();
     clearPersistedCookingSessionId();
     stopTracks();
-    navigate('/your-recipe', { state: { recipe: activeRecipe } });
+    navigate('/past-recipes', { state: { justFinished: true, recipeName: activeRecipe.recipe_name } });
   };
 
   const displayError = error || cameraError || nanaError;

@@ -1,5 +1,5 @@
 import React, { startTransition, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import type { RecipeRequestBody } from '../../types/api';
 import ErrorMessage from '../components/ErrorMessage';
 import IngredientScanPanel from '../components/IngredientScanPanel';
@@ -7,6 +7,7 @@ import LoadingIndicator from '../components/LoadingIndicator';
 import ModeSelector from '../components/ModeSelector';
 import { useLiveIngredientScan } from '../hooks/useLiveIngredientScan';
 import { requestRecipe } from '../hooks/useRecipeRequest';
+import { useAuth } from '../context/AuthContext';
 
 const PLACEHOLDERS: Record<string, string> = {
   suggestion: 'Please enter a recipe suggestion or idea: steak and mashed potatoes',
@@ -16,6 +17,7 @@ const PLACEHOLDERS: Record<string, string> = {
 
 const MainPage = () => {
   const navigate = useNavigate();
+  const { session: authSession } = useAuth();
   const [selectedMode, setSelectedMode] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -112,7 +114,7 @@ const MainPage = () => {
         inputValue: trimmedInput,
         inputMethod: usingCameraIngredients ? 'camera_live' : undefined,
         ingredientsList: usingCameraIngredients ? cleanedConfirmedIngredients : undefined
-      });
+      }, authSession?.access_token);
 
       startTransition(() => {
         navigate('/your-recipe', {
@@ -190,6 +192,10 @@ const MainPage = () => {
 
         {errorMessage && <ErrorMessage message={errorMessage} />}
       </form>
+
+      <Link to="/past-recipes" className="back-link">
+        View Past Recipes
+      </Link>
     </main>
   );
 };

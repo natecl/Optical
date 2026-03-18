@@ -95,17 +95,7 @@ const PastRecipesPage = () => {
         <section className="recipe-content">
           {recipes.map((recipe) => (
             <div key={recipe.id} className="recipe-card">
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => handleRecipeClick(recipe)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    handleRecipeClick(recipe);
-                  }
-                }}
-                style={{ cursor: 'pointer' }}
-              >
+              <div>
                 <p>
                   <strong>{recipe.recipe_name}</strong>
                 </p>
